@@ -1,448 +1,483 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Mission</title>
-  <style>
-@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
-    * {
-      box-sizing: border-box;
-      font-family: "Exo 2", "Roboto";
-      font-optical-sizing: auto;
-      font-display: swap;
-      font-style: normal;
-      padding: 0;
-      margin: 0;
-    }
-    img {
-      width: 100%;
-      height: auto;
-    }
-    body {
-      background: #f4f7fa;
-      color: #444;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      background: #fff;
-      color: #444;
-      padding: 1em;
-    }
-    header h1 {
-      margin-left: 2rem;
-    }
-    header a {
-      font-size: 1.4rem;
-      color: #444;
-    }
-    .mission {
-      display: grid;
-      gap: 1rem;
-      border: 2px solid #444;
-      text-align: center;
-      padding: 20px;
-      width: 80%;
-      margin: auto;
-      max-width: 480px;
-      transition: all 0.3s ease-in;
-      background-color: #ffffff;
-      border-radius: 10px;
-      margin-top: 4rem;
-    }
-    .mission:hover {
-      transform: scale(1.06);
-    }
-    .mission h1 {
-      font-size: 1.6rem;
-    }
-    .mission h3 {
-      font-weight: normal;
-      font-size: 1rem;
-    }
-    form {
-      display: grid;
-      gap: 10px;
-      width: 100%;
-      margin-top: 20px;
-    }
-    label {
-      margin-bottom: 5px;
-      color: #333;
-    }
-    select,
-    input,
-    button {
-      width: 100%;
-      padding: 10px;
-      color: #333;
-      font-size: 1em;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    button {
-      cursor: pointer;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      padding: 10px;
-      font-size: 1em;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.4);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: #fefefe;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 500px;
-      border-radius: 10px;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    #updateMission {
-      position: fixed;
-      right: 5%;
-      bottom: 5%;
-      height: 64px;
-      width: 64px;
-      border-radius: 50%;
-      font-size: 1.4rem;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      border: 2px solid #4aad5b;
-    }
-    .user-progress .user h2 {
-      margin-bottom: 5px;
-    }
-    .user-progress .user p {
-      margin-bottom: 5px;
-    }
-    .user-progress-list {
-      width: 100%;
-      padding: 20px;
-      margin: auto;
-      margin-top: 24px;
-      margin-bottom: 24px;
-    }
-    .user-progress-list h1 {
-      text-align: center;
-      font-size: 2.4rem;
-      margin-bottom: 2rem;
-    }
-    .user-progress {
-      display: grid;
-        grid-template-columns: repeat(auto-fit, 300px);
-        justify-content: space-evenly;
-        margin-top: 0.4rem;
-        row-gap: 2rem;
-    }
-    .user {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 0.5em;
-      padding: 1em;
-      text-align: center;
-      width: 300px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    .user img {
-      height: 128px;
-      width: 128px;
-      border-radius: 50%;
-      margin: auto;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <a href="dashboard.html"><i class="fa-solid fa-arrow-left"></i></a>
-    <h1>Manage Mission</h1>
-    <button id="updateMission">
-      <i class="fa-solid fa-pen-to-square"></i>
-    </button>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Manage Mission</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;1,700&display=swap");
+      * {
+        box-sizing: border-box;
+        font-family: "Exo 2", sans-serif;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        background: #eef2f6;
+        color: #444;
+        line-height: 1.6;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: #4aad5b;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      header a {
+        font-size: 1.4rem;
+        color: #fff;
+      }
+      main {
+        padding: 2rem 1rem;
+      }
+      .mission {
+        display: grid;
+        gap: 1rem;
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 2rem auto;
+      }
+      .mission h1,
+      .mission h3 {
+        text-align: center;
+      }
+      form {
+        display: grid;
+        gap: 1.2rem;
+        width: 100%;
+        margin-top: 1.5rem;
+      }
+      label {
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 700;
+      }
+      select,
+      input,
+      button {
+        padding: 0.8rem;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        background-color: #4aad5b;
+        color: #fff;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #3d914a;
+      }
+      .user-progress-list {
+        max-width: 1000px;
+        margin: 3rem auto;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .user-progress-list h1 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f4f7fa;
+        font-size: 1.1rem;
+      }
+      tr:hover {
+        background-color: #f9f9f9;
+      }
+      #pagination {
+        text-align: center;
+      }
+      #pagination button {
+        margin: 0 1rem;
+        padding: 0.6rem 1.5rem;
+        border-radius: 5px;
+        background-color: #4aad5b;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+      }
+      #pagination button:disabled {
+        background-color: #ccc;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 600px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .close {
+        float: right;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="dashboard.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Manage Mission</h1>
+      <button id="updateMission">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+    </header>
 
-  <main>
-    <section class="mission">
-      <div>
-        <h1 id="displaySteps">Create mission first.</h1>
-        <h3>Required Steps</h3>
-      </div>
-      <div>
-        <h1 id="displayReward">Create mission first.</h1>
-        <h3>Reward</h3>
-      </div>
-      <div>
-        <h1 id="displayEndDate">Create mission first.</h1>
-        <h3>End Date</h3>
-      </div>
-    </section>
+    <main>
+      <section class="mission">
+        <div>
+          <h1 id="displaySteps">Create mission first.</h1>
+          <h3>Required Steps</h3>
+        </div>
+        <div>
+          <h1 id="displayReward">Create mission first.</h1>
+          <h3>Reward</h3>
+        </div>
+        <div>
+          <h1 id="displayEndDate">Create mission first.</h1>
+          <h3>End Date</h3>
+        </div>
+      </section>
 
-    <section class="user-progress-list">
-      <h1>User Progress</h1>
-      <div class="user-progress" id="userProgress"></div>
-    </section>
-  </main>
+      <section class="user-progress-list">
+        <h1>User Progress</h1>
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Mission Steps</th>
+              <th>Missions Completed</th>
+            </tr>
+          </thead>
+          <tbody id="userProgress"></tbody>
+        </table>
+        <div id="pagination">
+          <button id="prevPage" disabled>Previous</button>
+          <span id="pageDisplay">Page 1</span>
+          <button id="nextPage">Next</button>
+        </div>
+      </section>
+    </main>
 
-  <!-- The Modal -->
-  <div id="missionModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <form id="missionForm">
-        <label for="steps">Steps:</label>
-        <select id="steps" name="steps" aria-label="Select Steps">
-          <option>250</option>
-          <option>30000</option>
-          <option>50000</option>
-          <option>55000</option>
-          <option>60000</option>
-          <option>70000</option>
-        </select>
-        <label for="reward">Reward:</label>
-        <select id="reward" name="reward" aria-label="Select Reward">
-          <option>1000</option>
-          <option>10000</option>
-          <option>20000</option>
-          <option>30000</option>
-          <option>40000</option>
-          <option>50000</option>
-        </select>
-        <label for="endDate">End Date:</label>
-        <input
-        type="date"
-        id="endDate"
-        name="endDate"
-        aria-label="Select End Date"
-        required
-        />
-        <button type="button" id="saveMission">SAVE</button>
-      </form>
+    <!-- The Modal -->
+    <div id="missionModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="missionForm">
+          <label for="steps">Steps:</label>
+          <select id="steps" name="steps" aria-label="Select Steps">
+            <option>250</option>
+            <option>30000</option>
+            <option>50000</option>
+            <option>55000</option>
+            <option>60000</option>
+            <option>70000</option>
+          </select>
+          <label for="reward">Reward:</label>
+          <select id="reward" name="reward" aria-label="Select Reward">
+            <option>1000</option>
+            <option>10000</option>
+            <option>20000</option>
+            <option>30000</option>
+            <option>40000</option>
+            <option>50000</option>
+          </select>
+          <label for="endDate">End Date:</label>
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            aria-label="Select End Date"
+            required
+            min=""
+          />
+
+          <button type="button" id="saveMission">SAVE</button>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <script
-    src="https://kit.fontawesome.com/ec19991922.js"
-    crossorigin="anonymous"
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
     ></script>
-  <script type="module">
-    import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      collection,
-      query,
-      where,
-      getDocs,
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getAnalytics
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        collection,
+        query,
+        where,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
-      authDomain: "treestride-project.firebaseapp.com",
-      projectId: "treestride-project",
-      storageBucket: "treestride-project.appspot.com",
-      messagingSenderId: "218404996569",
-      appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
-      measurementId: "G-XR01C3LFWD",
-    };
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
+        authDomain: "treestride-project.firebaseapp.com",
+        projectId: "treestride-project",
+        storageBucket: "treestride-project.appspot.com",
+        messagingSenderId: "218404996569",
+        appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
+        measurementId: "G-XR01C3LFWD",
+      };
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
 
-    // Check authentication state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const email = user.email;
-        if (email !== "admin@gmail.com") {
-          alert("Unauthorized access. Redirecting to login.");
+      // Check authentication state
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const email = user.email;
+          if (email !== "admin@gmail.com") {
+            alert("Unauthorized access. Redirecting to login.");
+            window.location.href = "index.html";
+          }
+        } else {
+          alert("You are not logged in. Redirecting to login.");
           window.location.href = "index.html";
         }
-      } else {
-        alert("You are not logged in. Redirecting to login.");
-        window.location.href = "index.html";
-      }
-    });
+      });
 
-    const missionDocRef = doc(db, "mission", "currentMission");
+      const missionDocRef = doc(db, "mission", "currentMission");
 
-    async function loadMission() {
-      try {
-        const missionDoc = await getDoc(missionDocRef);
-        if (missionDoc.exists()) {
-          const data = missionDoc.data();
-          const endDate = new Date(data.endDate);
+      async function loadMission() {
+        try {
+          const missionDoc = await getDoc(missionDocRef);
+          if (missionDoc.exists()) {
+            const data = missionDoc.data();
+            const endDate = new Date(data.endDate);
 
-          document.getElementById("displaySteps").textContent = data.steps;
-          document.getElementById("displayReward").textContent = data.reward;
-          document.getElementById("displayEndDate").textContent =
-          formatDate(endDate);
+            document.getElementById("displaySteps").textContent = data.steps;
+            document.getElementById("displayReward").textContent = data.reward;
+            document.getElementById("displayEndDate").textContent =
+              formatDate(endDate);
 
-          const today = new Date();
-          if (isSameDate(today, endDate)) {
-            // alert("Today is the end date of the mission!");
+            // Pre-fill the form inputs with existing data
+            document.getElementById("steps").value = data.steps;
+            document.getElementById("reward").value = data.reward;
+            document.getElementById("endDate").value = formatForInput(
+              new Date()
+            );
+          } else {
+            console.log("No mission found, set new mission.");
           }
-
-          // Pre-fill the form inputs with existing data
-          document.getElementById("steps").value = data.steps;
-          document.getElementById("reward").value = data.reward;
-          document.getElementById("endDate").value = formatForInput(
-            new Date()
-          );
-        } else {
-          console.log("No mission found, set new mission.");
+        } catch (error) {
+          console.error("Error loading mission: ", error);
         }
-      } catch (error) {
-        console.error("Error loading mission: ", error);
       }
-    }
 
-    // Helper function to compare dates (ignores time)
-    function isSameDate(date1, date2) {
-      return (
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
-      );
-    }
-
-    // Load mission on page load
-    window.onload = function () {
-      loadMission();
-      loadUserProgress();
-    };
-
-    function formatDate(date) {
-      const options = {
-        month: "long",
+      // Load mission on page load
+      window.onload = function () {
+        loadMission();
+        loadUserProgress();
       };
-      const month = date.toLocaleString("en-US", options);
-      const day = date.getDate();
-      const year = date.getFullYear();
-      return `${month} ${day}, ${year}`;
-    }
 
-    function formatForInput(date) {
-      return date.toISOString().split("T")[0];
-    }
+      function setMinEndDate() {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("endDate").setAttribute("min", today);
+      }
 
-    async function loadUserProgress() {
-      try {
-        const usersColRef = collection(db, "users");
-        const q = query(usersColRef, where("missionSteps", "!=", 0));
-        const querySnapshot = await getDocs(q);
+      // Call this function when the page loads or when the modal opens
+      window.onload = function () {
+        loadMission();
+        loadUserProgress();
+        setMinEndDate();
+      };
+
+      function formatDate(date) {
+        const options = {
+          month: "long",
+        };
+        const month = date.toLocaleString("en-US", options);
+        const day = date.getDate();
+        const year = date.getFullYear();
+        return `${month} ${day}, ${year}`;
+      }
+
+      function formatForInput(date) {
+        return date.toISOString().split("T")[0];
+      }
+
+      let usersData = [];
+      let currentPage = 1;
+      const usersPerPage = 10;
+
+      // Load User Progress with sorting and pagination
+      async function loadUserProgress() {
+        try {
+          const usersColRef = collection(db, "users");
+          const q = query(usersColRef, where("missionSteps", "!=", "0"));
+          const querySnapshot = await getDocs(q);
+
+          usersData = querySnapshot.docs.map((doc) => doc.data());
+
+          // Sort users by missionSteps in descending order
+          usersData.sort((a, b) => b.missionSteps - a.missionSteps);
+
+          displayUsers();
+
+          updatePaginationButtons();
+        } catch (error) {
+          console.error("Error loading user progress: ", error);
+        }
+      }
+
+      // Display users for the current page
+      function displayUsers() {
+        const start = (currentPage - 1) * usersPerPage;
+        const end = start + usersPerPage;
+        const usersToDisplay = usersData.slice(start, end);
 
         const userProgressContainer = document.getElementById("userProgress");
-        userProgressContainer.innerHTML = "";
+        userProgressContainer.innerHTML = ""; // Clear table before adding new rows
 
-        querySnapshot.forEach((doc) => {
-          const userData = doc.data();
-          const userDiv = document.createElement("div");
-          userDiv.className = "user";
-          userDiv.innerHTML = `
-          <img src="${userData.photoURL}" alt="${userData.username}">
-          <h2>${userData.username}</h2>
-          <p>Mission Steps: ${userData.missionSteps}</p>
-          <p>Missions Completed: ${userData.missionsCompleted}</p>
-          `;
-          userProgressContainer.appendChild(userDiv);
+        usersToDisplay.forEach((user) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+      <td>${user.username}</td>
+      <td>${user.missionSteps}</td>
+      <td>${user.missionsCompleted}</td>
+    `;
+          userProgressContainer.appendChild(row);
         });
-      } catch (error) {
-        console.error("Error loading user progress: ", error);
       }
-    }
 
-    const modal = document.getElementById("missionModal");
-    const btn = document.getElementById("updateMission");
-    const span = document.getElementsByClassName("close")[0];
+      // Update the state of pagination buttons
+      function updatePaginationButtons() {
+        const totalPages = Math.ceil(usersData.length / usersPerPage);
 
-    document.getElementById("saveMission").addEventListener("click", async function () {
-  const steps = document.getElementById("steps").value;
-  const reward = document.getElementById("reward").value;
-  const endDateValue = document.getElementById("endDate").value;
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled =
+          currentPage === totalPages;
 
-  // Save the date in ISO 8601 format
-  const endDate = new Date(endDateValue).toISOString();
+        document.getElementById(
+          "pageDisplay"
+        ).textContent = `Page ${currentPage}`;
+      }
 
-  try {
-    await setDoc(missionDocRef, {
-      steps: steps,
-      reward: reward,
-      endDate: endDate,
-    });
-    console.log("Mission saved successfully!");
-    alert("Mission saved successfully!");
-    document.getElementById("displaySteps").textContent = steps;
-    document.getElementById("displayReward").textContent = reward;
-    document.getElementById("displayEndDate").textContent = formatDate(new Date(endDate));
+      // Pagination event listeners
+      document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage--;
+          displayUsers();
+          updatePaginationButtons();
+        }
+      });
 
-    closeModal();
-  } catch (error) {
-    console.error("Error saving mission: ", error);
-    alert("Error saving mission!");
-  }
-});
+      document.getElementById("nextPage").addEventListener("click", () => {
+        const totalPages = Math.ceil(usersData.length / usersPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayUsers();
+          updatePaginationButtons();
+        }
+      });
 
-    function openModal() {
-      modal.style.display = "flex";
-    }
+      const modal = document.getElementById("missionModal");
+      const btn = document.getElementById("updateMission");
+      const span = document.getElementsByClassName("close")[0];
 
-    function closeModal() {
-      modal.style.display = "none";
-    }
+      document
+        .getElementById("saveMission")
+        .addEventListener("click", async function () {
+          const steps = document.getElementById("steps").value;
+          const reward = document.getElementById("reward").value;
+          const endDateValue = document.getElementById("endDate").value;
 
-    btn.onclick = function () {
-      openModal();
-    };
+          // Save the date in ISO 8601 format
+          const endDate = new Date(endDateValue).toISOString();
 
-    span.onclick = function () {
-      closeModal();
-    };
+          try {
+            await setDoc(missionDocRef, {
+              steps: steps,
+              reward: reward,
+              endDate: endDate,
+            });
+            console.log("Mission saved successfully!");
+            alert("Mission saved successfully!");
+            document.getElementById("displaySteps").textContent = steps;
+            document.getElementById("displayReward").textContent = reward;
+            document.getElementById("displayEndDate").textContent = formatDate(
+              new Date(endDate)
+            );
 
-    window.onclick = function (event) {
-      if (event.target == modal) {
+            closeModal();
+          } catch (error) {
+            console.error("Error saving mission: ", error);
+            alert("Error saving mission!");
+          }
+        });
+
+      function openModal() {
+        modal.style.display = "flex";
+      }
+
+      function closeModal() {
+        modal.style.display = "none";
+      }
+
+      btn.onclick = function () {
+        openModal();
+      };
+
+      span.onclick = function () {
         closeModal();
-      }
-    };
-  </script>
-</body>
+      };
+
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          closeModal();
+        }
+      };
+    </script>
+  </body>
 </html>
