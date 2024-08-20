@@ -19,19 +19,19 @@
       }
       header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 1rem 2rem;
-        background-color: #4aad5b;
-        color: #fff;
+        padding: 1rem;
+        background-color: #fefefe;
+        color: #444;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
       header h1 {
+        margin-left: 2rem;
         font-size: 1.8rem;
       }
       header a {
         font-size: 1.4rem;
-        color: #fff;
+        color: #444;
       }
       main {
         padding: 2rem 1rem;
@@ -80,6 +80,17 @@
       button:hover {
         background-color: #3d914a;
       }
+      #updateMission {
+        position: fixed;
+        right: 5%;
+        bottom: 5%;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        font-size: 1.4rem;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        border: 2px solid #4aad5b;
+      }
       .user-progress-list {
         max-width: 1000px;
         margin: 3rem auto;
@@ -100,7 +111,7 @@
       }
       th,
       td {
-        text-align: left;
+        text-align: center;
         padding: 12px;
         border-bottom: 1px solid #ddd;
       }
@@ -166,15 +177,15 @@
     <main>
       <section class="mission">
         <div>
-          <h1 id="displaySteps">Create mission first.</h1>
+          <h1 id="displaySteps">Initializing</h1>
           <h3>Required Steps</h3>
         </div>
         <div>
-          <h1 id="displayReward">Create mission first.</h1>
+          <h1 id="displayReward">Initializing</h1>
           <h3>Reward</h3>
         </div>
         <div>
-          <h1 id="displayEndDate">Create mission first.</h1>
+          <h1 id="displayEndDate">Initializing</h1>
           <h3>End Date</h3>
         </div>
       </section>

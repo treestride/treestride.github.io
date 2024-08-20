@@ -23,24 +23,28 @@
       body {
         background: #f4f7fa;
         color: #444;
-        padding: 20px;
       }
       header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        background: #fff;
+        padding: 1rem;
+        background-color: #fefefe;
         color: #444;
-        padding: 1em;
-        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
       header h1 {
-        margin: 0;
+        margin-left: 2rem;
+        font-size: 1.8rem;
+      }
+      header a {
+        font-size: 1.4rem;
+        color: #444;
       }
       .container {
         max-width: 800px;
         margin: 0 auto;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
         background: #fff;
         padding: 20px;
         border-radius: 8px;
@@ -65,7 +69,7 @@
         border-radius: 4px;
       }
       #map {
-        height: 300px;
+        height: 200px;
         margin-top: 10px;
       }
       button {
@@ -131,31 +135,73 @@
       #see-more-btn:hover {
         background-color: #4fbb61;
       }
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 8px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      #create-announcement-btn {
+        margin-bottom: 20px;
+        padding: 14px 24px;
+        background-color: #3a9249;
+        text-transform: uppercase;
+        color: white;
+        border: none;
+        font-size: 1.2rem;
+        border-radius: 4px;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      #create-announcement-btn:hover {
+        background-color: #4fbb61;
+      }
     </style>
   </head>
   <body>
     <header>
-      <h1>Announcements Management</h1>
-      <button id="back-to-dashboard">Back to Dashboard</button>
+      <a href="dashboard.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Manage Announcements</h1>
     </header>
+
     <div class="container">
-      <h2>Create New Announcement</h2>
-      <form id="announcement-form">
-        <label for="title">Title:</label>
-        <input type="text" id="title" required />
-
-        <label for="content">Content:</label>
-        <textarea id="content" rows="4" required></textarea>
-
-        <label for="image">Image (optional):</label>
-        <input type="file" id="image" accept="image/*" />
-
-        <label for="location">Location (optional):</label>
-        <div id="map"></div>
-        <input type="hidden" id="location" />
-
-        <button type="submit">Post Announcement</button>
-      </form>
+      <button id="create-announcement-btn">Create New Announcement</button>
 
       <div id="announcements">
         <h2>Current Announcements</h2>
@@ -164,6 +210,40 @@
       <button id="see-more-btn" style="display: none">See More</button>
     </div>
 
+    <!-- Modal -->
+    <div id="announcement-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modal-title">Create New Announcement</h2>
+        <form id="announcement-form">
+          <label for="title">Title:</label>
+          <input type="text" id="title" required />
+
+          <label for="content">Content:</label>
+          <textarea id="content" rows="4" required></textarea>
+
+          <label for="image">Image (optional):</label>
+          <input type="file" id="image" accept="image/*" />
+
+          <label for="location-sharing">
+            <input type="checkbox" id="location-sharing" />
+            Share Location
+          </label>
+
+          <div id="map" style="display: none"></div>
+          <input type="hidden" id="location" />
+
+          <button type="submit" id="submit-announcement">
+            Post Announcement
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
     <script type="module">
       // Import the necessary Firebase modules
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -182,6 +262,8 @@
         limit,
         doc,
         getDoc,
+        deleteDoc,
+        updateDoc,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
       import {
         getStorage,
@@ -209,21 +291,78 @@
 
       let lastVisible = null;
       const ANNOUNCEMENTS_PER_PAGE = 5;
-
-      // Initialize map
-      let map = L.map("map").setView([0, 0], 2);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
-      }).addTo(map);
-
+      let currentAnnouncementId = null;
+      let map;
       let marker;
-      map.on("click", function (e) {
-        if (marker) {
-          map.removeLayer(marker);
+
+      // Get modal elements
+      const modal = document.getElementById("announcement-modal");
+      const createAnnouncementBtn = document.getElementById(
+        "create-announcement-btn"
+      );
+      const closeBtn = document.getElementsByClassName("close")[0];
+
+      // Open modal
+      createAnnouncementBtn.onclick = function () {
+        modal.style.display = "block";
+        resetForm();
+        updateMapView(); // Update map view when opening the modal
+        setTimeout(() => {
+          map.invalidateSize(); // Force map to update its size properly
+        }, 0);
+      };
+
+      // Close modal
+      closeBtn.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      // Close modal when clicking outside
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
         }
-        marker = L.marker(e.latlng).addTo(map);
-        document.getElementById("location").value = JSON.stringify(e.latlng);
+      };
+
+      // Initialize map once when the page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        map = L.map("map").setView([0, 0], 2);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+
+        map.on("click", function (e) {
+          if (marker) {
+            map.removeLayer(marker);
+          }
+          marker = L.marker(e.latlng).addTo(map);
+          document.getElementById("location").value = JSON.stringify(e.latlng);
+        });
       });
+
+      // Function to update map view
+      function updateMapView() {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              map.setView([lat, lng], 13);
+              if (marker) map.removeLayer(marker);
+              marker = L.marker([lat, lng]).addTo(map);
+              document.getElementById("location").value = JSON.stringify({
+                lat,
+                lng,
+              });
+            },
+            function (error) {
+              console.error("Error getting location:", error.message);
+            }
+          );
+        } else {
+          console.log("Geolocation is not supported by this browser.");
+        }
+      }
 
       // Check authentication state
       onAuthStateChanged(auth, (user) => {
@@ -241,6 +380,26 @@
       });
 
       // Handle form submission
+      // Get the location sharing checkbox
+      const locationSharingCheckbox =
+        document.getElementById("location-sharing");
+
+      // Toggle map visibility based on the checkbox
+      locationSharingCheckbox.addEventListener("change", function () {
+        const mapContainer = document.getElementById("map");
+        if (this.checked) {
+          mapContainer.style.display = "block";
+          updateMapView(); // Update map view to user's location
+        } else {
+          mapContainer.style.display = "none";
+          if (marker) {
+            map.removeLayer(marker);
+          }
+          document.getElementById("location").value = ""; // Clear the location if unchecked
+        }
+      });
+
+      // Modify form submission handling to check the checkbox status
       document
         .getElementById("announcement-form")
         .addEventListener("submit", async (e) => {
@@ -249,6 +408,14 @@
           const content = document.getElementById("content").value;
           const imageFile = document.getElementById("image").files[0];
           const locationString = document.getElementById("location").value;
+
+          // Check if location sharing is enabled
+          const shareLocation = locationSharingCheckbox.checked;
+
+          let locationData = null;
+          if (shareLocation && locationString) {
+            locationData = JSON.parse(locationString);
+          }
 
           try {
             let imageUrl = "";
@@ -261,33 +428,48 @@
               imageUrl = await getDownloadURL(storageRef);
             }
 
-            await addDoc(collection(db, "announcements"), {
-              title,
-              content,
-              imageUrl,
-              location: locationString ? JSON.parse(locationString) : null,
-              timestamp: Timestamp.now(),
-            });
+            if (currentAnnouncementId) {
+              // Update existing announcement
+              await updateDoc(doc(db, "announcements", currentAnnouncementId), {
+                title,
+                content,
+                ...(imageUrl && { imageUrl }),
+                location: locationData,
+                timestamp: Timestamp.now(),
+              });
+              alert("Announcement updated successfully!");
+            } else {
+              // Create new announcement
+              await addDoc(collection(db, "announcements"), {
+                title,
+                content,
+                imageUrl,
+                location: locationData,
+                timestamp: Timestamp.now(),
+              });
+              alert("Announcement posted successfully!");
+            }
 
-            alert("Announcement posted successfully!");
-            document.getElementById("announcement-form").reset();
+            modal.style.display = "none";
+            resetForm();
             fetchAnnouncements();
           } catch (error) {
-            console.error("Error posting announcement: ", error);
-            alert("Failed to post announcement.");
+            console.error("Error posting/updating announcement: ", error);
+            alert("Failed to post/update announcement.");
           }
         });
 
       // Fetch and display announcements
       async function fetchAnnouncements(loadMore = false) {
         const announcementsDiv = document.getElementById("announcements");
+
         if (!loadMore) {
           announcementsDiv.innerHTML = "<h2>Current Announcements</h2>";
           lastVisible = null;
         }
 
         let q = query(
-          collection(db, "announcements_test"),
+          collection(db, "announcements"),
           orderBy("timestamp", "desc"),
           limit(ANNOUNCEMENTS_PER_PAGE)
         );
@@ -377,55 +559,27 @@
             ? JSON.stringify(data.location)
             : "";
 
-          // Update the form submission to handle edits
-          const form = document.getElementById("announcement-form");
-          form.onsubmit = async (e) => {
-            e.preventDefault();
-            await updateAnnouncement(id);
-          };
+          currentAnnouncementId = id;
+          document.getElementById("modal-title").textContent =
+            "Edit Announcement";
+          document.getElementById("submit-announcement").textContent =
+            "Update Announcement";
+          modal.style.display = "block";
 
-          // Scroll to the form
-          form.scrollIntoView({ behavior: "smooth" });
+          // Update map view and set marker if location exists
+          if (data.location) {
+            map.setView([data.location.lat, data.location.lng], 13);
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([data.location.lat, data.location.lng]).addTo(
+              map
+            );
+          } else {
+            updateMapView();
+          }
         } else {
           console.log("No such document!");
         }
       };
-
-      // Update announcement function
-      async function updateAnnouncement(id) {
-        const title = document.getElementById("title").value;
-        const content = document.getElementById("content").value;
-        const imageFile = document.getElementById("image").files[0];
-        const locationString = document.getElementById("location").value;
-
-        try {
-          let imageUrl = "";
-          if (imageFile) {
-            const storageRef = ref(
-              storage,
-              "announcement_images/" + Date.now() + "_" + imageFile.name
-            );
-            await uploadBytes(storageRef, imageFile);
-            imageUrl = await getDownloadURL(storageRef);
-          }
-
-          const docRef = doc(db, "announcements", id);
-          await updateDoc(docRef, {
-            title,
-            content,
-            ...(imageUrl && { imageUrl }),
-            location: locationString ? JSON.parse(locationString) : null,
-            timestamp: Timestamp.now(),
-          });
-
-          alert("Announcement updated successfully!");
-          document.getElementById("announcement-form").reset();
-          fetchAnnouncements();
-        } catch (error) {
-          console.error("Error updating announcement: ", error);
-          alert("Failed to update announcement.");
-        }
-      }
 
       // Delete announcement function
       window.deleteAnnouncement = async (id) => {
@@ -441,12 +595,31 @@
         }
       };
 
+      // Reset form function
+      function resetForm() {
+        document.getElementById("announcement-form").reset();
+        currentAnnouncementId = null;
+        document.getElementById("modal-title").textContent =
+          "Create New Announcement";
+        document.getElementById("submit-announcement").textContent =
+          "Post Announcement";
+        if (marker) {
+          map.removeLayer(marker);
+        }
+        updateMapView(); // Update map view to user's location
+      }
+
       // Back to dashboard button
       document
         .getElementById("back-to-dashboard")
         .addEventListener("click", () => {
           window.location.href = "dashboard.html";
         });
+
+      // See more button
+      document.getElementById("see-more-btn").addEventListener("click", () => {
+        fetchAnnouncements(true);
+      });
     </script>
   </body>
 </html>

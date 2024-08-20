@@ -45,21 +45,22 @@
       }
       .navigation {
         display: grid;
-        grid-template-columns: repeat(auto-fit, 300px);
+        grid-template-columns: repeat(auto-fit, 250px);
         justify-content: space-evenly;
         align-items: center;
-        margin-top: 4rem;
-        margin-bottom: 4rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
         row-gap: 1rem;
       }
       .navigation button {
-        padding: 3.4em;
+        padding: 2.4em;
+        text-align: center;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         background: #3a9249;
         color: #fff;
         border: 2px solid #4fbb61;
         border-radius: 1em;
-        font-size: 1.2em;
+        font-size: 1em;
         transition: all 0.3s ease-in;
       }
       .navigation button:hover {
@@ -69,6 +70,10 @@
         width: 80%;
         margin: auto;
         text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        border-radius: 14px;
+        margin-bottom: 2rem;
       }
 
       table {
@@ -101,6 +106,7 @@
         margin: 0 0.5em;
         border: none;
         background-color: #4fbb61;
+        border-radius: 0.3em;
         color: white;
         cursor: pointer;
       }
@@ -113,17 +119,17 @@
         font-size: 1.2em;
       }
 
-      .actions {
-        display: grid;
-        justify-content: center;
-      }
-
       .action-button {
         padding: 0.5em 1em;
         border: none;
         cursor: pointer;
         font-size: 0.9em;
         border-radius: 0.3em;
+      }
+
+      .view-button {
+        background-color: #4aad5b;
+        color: white;
       }
 
       .delete-button {
@@ -166,12 +172,16 @@
         row-gap: 1rem;
       }
       #user-details img {
-        width: 200px;
-        height: 200px;
+        width: 100px;
+        height: 100px;
       }
       .user-list h1 {
         text-align: center;
         margin-bottom: 1rem;
+      }
+      .actions {
+        display: grid;
+        gap: 1rem;
       }
     </style>
   </head>
@@ -185,7 +195,7 @@
     <main>
       <section class="navigation">
         <button onclick="window.location.href ='announcements.html'">
-          ANNOUNCEMENT
+          ANNOUNCEMENTS
         </button>
         <button onclick="window.location.href ='mission.html'">
           MANAGE MISSION
@@ -193,6 +203,7 @@
         <button onclick="window.location.href ='trees.html'">
           MANAGE TREES
         </button>
+        <button onclick="window.location.href ='#'">STAFF</button>
       </section>
       <section class="user-list">
         <h1>User List</h1>
@@ -204,7 +215,7 @@
                 <th>Username</th>
                 <th>Total Points</th>
                 <th>Total Steps</th>
-                <th>Total Trees</th>
+                <th>Trees Planted</th>
                 <th>Missions Completed</th>
                 <th>Actions</th>
               </tr>
@@ -224,11 +235,17 @@
           <span class="close">&times;</span>
           <h2>User Details</h2>
           <div id="user-details">
+            <p style="display: grid; margin: auto">
+              <strong>Profile:</strong>
+              <br> 
+              <img src="" id="modal-profile"></img>
+            </p>
             <p><strong>Username:</strong> <span id="modal-username"></span></p>
             <p><strong>Email:</strong> <span id="modal-email"></span></p>
             <p><strong>Phone Number:</strong> <span id="modal-phone"></span></p>
-            <p>
+            <p style="display: grid; margin: auto">
               <strong>QR Code:</strong>
+              <br />
               <img id="modal-qr" src="" alt="User QR Code" />
             </p>
           </div>
@@ -364,6 +381,8 @@
             const userData = userSnap.data();
 
             // Populate modal with user data
+            document.getElementById("modal-profile").src =
+              userData.photoURL;
             document.getElementById("modal-username").innerText =
               userData.username;
             document.getElementById("modal-email").innerText = userData.email;
