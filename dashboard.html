@@ -203,7 +203,6 @@
         <button onclick="window.location.href ='trees.html'">
           MANAGE TREES
         </button>
-        <button onclick="window.location.href ='#'">STAFF</button>
       </section>
       <section class="user-list">
         <h1>User List</h1>
@@ -300,7 +299,7 @@
             fetchUsers();
           }
         } else {
-          alert("You are not logged in. Redirecting to login.");
+          alert("Redirecting to login.");
           window.location.href = "index.html";
         }
       });
@@ -314,7 +313,7 @@
       async function fetchUsers() {
         const querySnapshot = await getDocs(collection(db, "users"));
         users = querySnapshot.docs.map((doc) => {
-          return { uid: doc.id, ...doc.data() }; // Add uid explicitly here
+          return { uid: doc.id, ...doc.data() };
         });
         totalUsers = users.length;
         displayUsers(currentPage);
@@ -375,7 +374,7 @@
       // Function to display user details in the modal
       async function showUserDetails(uid) {
         try {
-          const userRef = doc(db, "users", uid); // Ensure correct 'uid' is being passed here
+          const userRef = doc(db, "users", uid); 
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             const userData = userSnap.data();
@@ -405,7 +404,7 @@
 
       viewButtons.forEach((button) => {
         button.addEventListener("click", async (event) => {
-          const uid = event.target.getAttribute("data-uid"); // Ensure this 'uid' is correct
+          const uid = event.target.getAttribute("data-uid"); 
           await showUserDetails(uid);
         });
       });
@@ -438,7 +437,7 @@
       async function deleteUser(uid, index) {
         if (confirm("Are you sure you want to delete this user?")) {
           try {
-            const userRef = doc(db, "users", uid); // Ensure 'uid' is correct
+            const userRef = doc(db, "users", uid);
             await deleteDoc(userRef);
             alert(`User deleted successfully.`);
 
