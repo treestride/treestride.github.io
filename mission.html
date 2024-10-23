@@ -15,7 +15,6 @@
       body {
         background: #eef2f6;
         color: #444;
-        line-height: 1.6;
       }
       header {
         display: flex;
@@ -27,7 +26,6 @@
       }
       header h1 {
         margin-left: 2rem;
-        font-size: 1.8rem;
       }
       header a {
         font-size: 1.4rem;
@@ -177,15 +175,15 @@
     <main>
       <section class="mission">
         <div>
-          <h1 id="displaySteps">Initializing</h1>
+          <h1 id="displaySteps">No Mission/Initializing</h1>
           <h3>Required Steps</h3>
         </div>
         <div>
-          <h1 id="displayReward">Initializing</h1>
+          <h1 id="displayReward">No Mission/Initializing</h1>
           <h3>Reward</h3>
         </div>
         <div>
-          <h1 id="displayEndDate">Initializing</h1>
+          <h1 id="displayEndDate">No Mission/Initializing</h1>
           <h3>End Date</h3>
         </div>
       </section>
@@ -264,6 +262,8 @@
         query,
         where,
         getDocs,
+        orderBy,
+        limit,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
       import {
         getAuth,
@@ -284,6 +284,13 @@
       const db = getFirestore(app);
       const auth = getAuth(app);
 
+      let usersData = [];
+      let lastVisible = null;
+      let firstVisible = null;
+      let totalPages = 1;
+      let currentPage = 1;
+      const usersPerPage = 10;
+
       // Check authentication state
       onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -293,7 +300,7 @@
             window.location.href = "index.html";
           }
         } else {
-          alert("You are not logged in. Redirecting to login.");
+          alert("Redirecting to login.");
           window.location.href = "index.html";
         }
       });
@@ -358,24 +365,44 @@
         return date.toISOString().split("T")[0];
       }
 
-      let usersData = [];
-      let currentPage = 1;
-      const usersPerPage = 10;
-
       // Load User Progress with sorting and pagination
-      async function loadUserProgress() {
+      async function loadUserProgress(direction) {
         try {
           const usersColRef = collection(db, "users");
-          const q = query(usersColRef, where("missionSteps", "!=", "0"));
-          const querySnapshot = await getDocs(q);
+          let q = query(
+            usersColRef,
+            where("missionSteps", "!=", 0),
+            limit(usersPerPage)
+          );
 
-          usersData = querySnapshot.docs.map((doc) => doc.data());
+          if (direction === "next" && lastVisible) {
+            q = query(
+              usersColRef,
+              where("missionSteps", "!=", 0),
+              startAfter(lastVisible),
+              limit(usersPerPage)
+            );
+          } else if (direction === "prev" && firstVisible) {
+            // For previous page, you need to load the previous batch and reverse it
+            const reverseQ = query(
+              usersColRef,
+              where("missionSteps", "!=", 0),
+              endBefore(firstVisible),
+              limitToLast(usersPerPage)
+            );
+            const reverseSnapshot = await getDocs(reverseQ);
+            usersData = reverseSnapshot.docs.map((doc) => doc.data()).reverse();
+          } else {
+            const querySnapshot = await getDocs(q);
+            usersData = querySnapshot.docs.map((doc) => doc.data());
+            lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+            firstVisible = querySnapshot.docs[0];
+          }
 
           // Sort users by missionSteps in descending order
           usersData.sort((a, b) => b.missionSteps - a.missionSteps);
 
           displayUsers();
-
           updatePaginationButtons();
         } catch (error) {
           console.error("Error loading user progress: ", error);
@@ -384,32 +411,25 @@
 
       // Display users for the current page
       function displayUsers() {
-        const start = (currentPage - 1) * usersPerPage;
-        const end = start + usersPerPage;
-        const usersToDisplay = usersData.slice(start, end);
-
         const userProgressContainer = document.getElementById("userProgress");
         userProgressContainer.innerHTML = ""; // Clear table before adding new rows
 
-        usersToDisplay.forEach((user) => {
+        usersData.forEach((user) => {
           const row = document.createElement("tr");
           row.innerHTML = `
-      <td>${user.username}</td>
-      <td>${user.missionSteps}</td>
-      <td>${user.missionsCompleted}</td>
-    `;
+            <td>${user.username}</td>
+            <td>${user.missionSteps}</td>
+            <td>${user.missionsCompleted}</td>
+          `;
           userProgressContainer.appendChild(row);
         });
       }
 
       // Update the state of pagination buttons
       function updatePaginationButtons() {
-        const totalPages = Math.ceil(usersData.length / usersPerPage);
-
         document.getElementById("prevPage").disabled = currentPage === 1;
         document.getElementById("nextPage").disabled =
-          currentPage === totalPages;
-
+          usersData.length < usersPerPage;
         document.getElementById(
           "pageDisplay"
         ).textContent = `Page ${currentPage}`;
@@ -419,17 +439,14 @@
       document.getElementById("prevPage").addEventListener("click", () => {
         if (currentPage > 1) {
           currentPage--;
-          displayUsers();
-          updatePaginationButtons();
+          loadUserProgress("prev");
         }
       });
 
       document.getElementById("nextPage").addEventListener("click", () => {
-        const totalPages = Math.ceil(usersData.length / usersPerPage);
-        if (currentPage < totalPages) {
+        if (usersData.length === usersPerPage) {
           currentPage++;
-          displayUsers();
-          updatePaginationButtons();
+          loadUserProgress("next");
         }
       });
 

@@ -28,7 +28,7 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         background: #fff;
         color: #444;
-        padding: 1em;
+        padding: 1rem;
       }
       header h1 {
         margin-left: 2rem;
@@ -345,8 +345,8 @@
           <label for="treeImage">Upload Image:</label>
           <input
             type="file"
-            id="treeImageFile"
-            name="treeImageFile"
+            id="treeImage"
+            name="treeImage"
             accept="image/*"
             aria-label="Upload Image"
           />
@@ -599,7 +599,7 @@
         document.getElementById("treeType").value = type;
         document.getElementById("existingTreeImage").value = image;
         document.getElementById("availableTrees").value = availableTrees;
-        document.getElementById("treeImageFile").value = "";
+        document.getElementById("treeImage").value = "";
         document.getElementById(
           "currentImageLabel"
         ).textContent = `Current File: ${name} Image`;
@@ -607,7 +607,7 @@
       };
 
       document
-        .getElementById("treeImageFile")
+        .getElementById("treeImage")
         .addEventListener("change", function () {
           const file = this.files[0];
           if (file) {
@@ -625,7 +625,7 @@
           const description = document.getElementById("treeDescription").value;
           const treeCost = document.getElementById("treeCost").value;
           const type = document.getElementById("treeType").value;
-          const imageFile = document.getElementById("treeImageFile").files[0];
+          const imageFile = document.getElementById("treeImage").files[0];
           const availableTrees =
             document.getElementById("availableTrees").value;
 
