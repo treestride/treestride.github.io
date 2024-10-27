@@ -48,6 +48,50 @@
       .mission h3 {
         text-align: center;
       }
+      .progress-section {
+        max-width: 1000px;
+        margin: 3rem auto;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .progress-section h1 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        color: #4aad5b;
+      }
+      .completed-section {
+        margin-top: 3rem;
+      }
+      .completed-section h1 {
+        color: #2d8a3e;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+      }
+      th,
+      td {
+        text-align: center;
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f4f7fa;
+        font-size: 1.1rem;
+      }
+      tr:hover {
+        background-color: #f9f9f9;
+      }
+      .no-data {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+        font-style: italic;
+      }
       form {
         display: grid;
         gap: 1.2rem;
@@ -188,9 +232,33 @@
         </div>
       </section>
 
-      <section class="user-progress-list">
-        <h1>User Progress</h1>
+      <section class="progress-section">
+        <h1>Users In Progress</h1>
         <table id="userTable">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Mission Steps</th>
+              <th>Progress</th>
+              <th>Missions Completed</th>
+            </tr>
+          </thead>
+          <tbody id="userProgress">
+            <tr class="no-data">
+              <td colspan="4">Loading user data...</td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="pagination">
+          <button id="prevPage" disabled>Previous</button>
+          <span id="pageDisplay">Page 1</span>
+          <button id="nextPage">Next</button>
+        </div>
+      </section>
+
+      <section class="progress-section completed-section">
+        <h1>Users Completed</h1>
+        <table id="completedTable">
           <thead>
             <tr>
               <th>Username</th>
@@ -198,13 +266,12 @@
               <th>Missions Completed</th>
             </tr>
           </thead>
-          <tbody id="userProgress"></tbody>
+          <tbody id="completedProgress">
+            <tr class="no-data">
+              <td colspan="3">Loading completed missions...</td>
+            </tr>
+          </tbody>
         </table>
-        <div id="pagination">
-          <button id="prevPage" disabled>Previous</button>
-          <span id="pageDisplay">Page 1</span>
-          <button id="nextPage">Next</button>
-        </div>
       </section>
     </main>
 
@@ -264,6 +331,9 @@
         getDocs,
         orderBy,
         limit,
+        startAfter,
+        endBefore,
+        limitToLast,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
       import {
         getAuth,
@@ -285,10 +355,11 @@
       const auth = getAuth(app);
 
       let usersData = [];
+      let completedUsers = [];
       let lastVisible = null;
       let firstVisible = null;
-      let totalPages = 1;
       let currentPage = 1;
+      let requiredSteps = 0;
       const usersPerPage = 10;
 
       // Check authentication state
@@ -312,6 +383,7 @@
           const missionDoc = await getDoc(missionDocRef);
           if (missionDoc.exists()) {
             const data = missionDoc.data();
+            requiredSteps = parseInt(data.steps);
             const endDate = new Date(data.endDate);
 
             document.getElementById("displaySteps").textContent = data.steps;
@@ -319,14 +391,15 @@
             document.getElementById("displayEndDate").textContent =
               formatDate(endDate);
 
-            // Pre-fill the form inputs with existing data
+            // Pre-fill form
             document.getElementById("steps").value = data.steps;
             document.getElementById("reward").value = data.reward;
             document.getElementById("endDate").value = formatForInput(
               new Date()
             );
-          } else {
-            console.log("No mission found, set new mission.");
+
+            // Load users after getting required steps
+            await loadUserProgress();
           }
         } catch (error) {
           console.error("Error loading mission: ", error);
@@ -344,84 +417,142 @@
         document.getElementById("endDate").setAttribute("min", today);
       }
 
-      // Call this function when the page loads or when the modal opens
-      window.onload = function () {
-        loadMission();
-        loadUserProgress();
-        setMinEndDate();
-      };
-
-      function formatDate(date) {
-        const options = {
-          month: "long",
-        };
-        const month = date.toLocaleString("en-US", options);
-        const day = date.getDate();
-        const year = date.getFullYear();
-        return `${month} ${day}, ${year}`;
-      }
-
-      function formatForInput(date) {
-        return date.toISOString().split("T")[0];
-      }
-
       // Load User Progress with sorting and pagination
       async function loadUserProgress(direction) {
         try {
           const usersColRef = collection(db, "users");
-          let q = query(
-            usersColRef,
-            where("missionSteps", "!=", 0),
-            limit(usersPerPage)
-          );
+          let q;
 
+          // Modified base query - removed the where clause initially to check if any users exist
           if (direction === "next" && lastVisible) {
             q = query(
               usersColRef,
-              where("missionSteps", "!=", 0),
+              orderBy("missionSteps", "desc"),
               startAfter(lastVisible),
               limit(usersPerPage)
             );
           } else if (direction === "prev" && firstVisible) {
-            // For previous page, you need to load the previous batch and reverse it
-            const reverseQ = query(
+            q = query(
               usersColRef,
-              where("missionSteps", "!=", 0),
+              orderBy("missionSteps", "desc"),
               endBefore(firstVisible),
               limitToLast(usersPerPage)
             );
-            const reverseSnapshot = await getDocs(reverseQ);
-            usersData = reverseSnapshot.docs.map((doc) => doc.data()).reverse();
           } else {
-            const querySnapshot = await getDocs(q);
-            usersData = querySnapshot.docs.map((doc) => doc.data());
-            lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-            firstVisible = querySnapshot.docs[0];
+            q = query(
+              usersColRef,
+              orderBy("missionSteps", "desc"),
+              limit(usersPerPage)
+            );
           }
 
-          // Sort users by missionSteps in descending order
-          usersData.sort((a, b) => b.missionSteps - a.missionSteps);
+          const querySnapshot = await getDocs(q);
+          console.log("Number of users found:", querySnapshot.size); // Debug log
+
+          if (!querySnapshot.empty) {
+            lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+            firstVisible = querySnapshot.docs[0];
+
+            const allUsers = querySnapshot.docs.map((doc) => {
+              const data = doc.data();
+              console.log("User data:", data); // Debug log
+              return {
+                ...data,
+                id: doc.id,
+                // Convert to number to ensure proper comparisons
+                missionSteps: Number(data.missionSteps || 0),
+                missionsCompleted: Number(data.missionsCompleted || 0),
+              };
+            });
+
+            separateUsers(allUsers);
+          } else {
+            console.log("No users found in query"); // Debug log
+            usersData = [];
+            completedUsers = [];
+          }
 
           displayUsers();
+          displayCompletedUsers();
           updatePaginationButtons();
         } catch (error) {
           console.error("Error loading user progress: ", error);
         }
       }
-
       // Display users for the current page
+      function separateUsers(allUsers) {
+        usersData = [];
+        completedUsers = [];
+
+        allUsers.forEach((user) => {
+          if (user.missionSteps >= requiredSteps) {
+            completedUsers.push(user);
+          } else if (user.missionSteps > 0) {
+            usersData.push(user);
+          }
+        });
+      }
+
+      // displayUsers function
       function displayUsers() {
         const userProgressContainer = document.getElementById("userProgress");
-        userProgressContainer.innerHTML = ""; // Clear table before adding new rows
+        if (!userProgressContainer) {
+          console.error("User progress container not found");
+          return;
+        }
+
+        userProgressContainer.innerHTML = "";
+
+        if (usersData.length === 0) {
+          userProgressContainer.innerHTML = `
+      <tr class="no-data">
+        <td colspan="4">No users in progress</td>
+      </tr>`;
+          return;
+        }
 
         usersData.forEach((user) => {
+          const progress = (
+            (Number(user.missionSteps) / Number(requiredSteps)) *
+            100
+          ).toFixed(1);
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${user.username}</td>
-            <td>${user.missionSteps}</td>
-            <td>${user.missionsCompleted}</td>
-          `;
+      <td>${user.username || "Unknown"}</td>
+      <td>${user.missionSteps || 0}</td>
+      <td>${progress}%</td>
+      <td>${user.missionsCompleted || 0}</td>
+    `;
           userProgressContainer.appendChild(row);
+        });
+      }
+
+      // New function to display completed users
+      function displayCompletedUsers() {
+        const completedContainer = document.getElementById("completedProgress");
+        if (!completedContainer) {
+          console.error("Completed progress container not found");
+          return;
+        }
+
+        completedContainer.innerHTML = "";
+
+        if (completedUsers.length === 0) {
+          completedContainer.innerHTML = `
+      <tr class="no-data">
+        <td colspan="3">No completed missions yet</td>
+      </tr>`;
+          return;
+        }
+
+        completedUsers.forEach((user) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+      <td>${user.username || "Unknown"}</td>
+      <td>${user.missionSteps || 0}</td>
+      <td>${user.missionsCompleted || 0}</td>
+    `;
+          completedContainer.appendChild(row);
         });
       }
 
@@ -506,6 +637,31 @@
           closeModal();
         }
       };
+
+      // Format date functions
+      function formatDate(date) {
+        const options = { month: "long" };
+        const month = date.toLocaleString("en-US", options);
+        const day = date.getDate();
+        const year = date.getFullYear();
+        return `${month} ${day}, ${year}`;
+      }
+
+      function formatForInput(date) {
+        return date.toISOString().split("T")[0];
+      }
+
+      async function initializePage() {
+        try {
+          await loadMission(); // Load mission data first
+          await loadUserProgress(); // Then load user data
+        } catch (error) {
+          console.error("Error initializing page:", error);
+        }
+      }
+
+      // Initialize the page
+      window.onload = initializePage;
     </script>
   </body>
 </html>

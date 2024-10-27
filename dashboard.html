@@ -183,6 +183,33 @@
         display: grid;
         gap: 1rem;
       }
+      .edit-button {
+      background-color: #ffc107;
+      color: white;
+    }
+    
+    .modal-form {
+      display: grid;
+      gap: 1rem;
+      text-align: left;
+    }
+    
+    .modal-form input {
+      padding: 0.5em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+    }
+    
+    .save-button {
+      background-color: #4aad5b;
+      color: white;
+      padding: 0.5em 1em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
     </style>
   </head>
   <body>
@@ -202,6 +229,12 @@
         </button>
         <button onclick="window.location.href ='trees.html'">
           MANAGE TREES
+        </button>
+        <button onclick="window.location.href ='plant_request.html'">
+          PLANT REQUESTS
+        </button>
+        <button onclick="window.location.href ='posts_reported.html'">
+          POSTS REPORTED
         </button>
       </section>
       <section class="user-list">
@@ -228,6 +261,7 @@
           </div>
         </div>
       </section>
+
       <!-- User Details Modal -->
       <div id="user-modal" class="modal" style="display: none">
         <div class="modal-content">
@@ -250,6 +284,46 @@
           </div>
         </div>
       </div>
+
+       <!-- Add new Edit Modal -->
+    <div id="edit-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" onclick="document.getElementById('edit-modal').style.display='none'">&times;</span>
+        <h2>Edit User Details</h2>
+        <form id="edit-form" class="modal-form">
+          <input type="hidden" id="edit-uid">
+          <div>
+            <label for="edit-username">Username:</label>
+            <input type="text" id="edit-username" required>
+          </div>
+          <div>
+            <label for="edit-email">Email:</label>
+            <input type="email" id="edit-email" required>
+          </div>
+          <div>
+            <label for="edit-phone">Phone Number:</label>
+            <input type="tel" id="edit-phone">
+          </div>
+          <div>
+            <label for="edit-points">Total Points:</label>
+            <input type="number" id="edit-points" required>
+          </div>
+          <div>
+            <label for="edit-steps">Total Steps:</label>
+            <input type="number" id="edit-steps" required>
+          </div>
+          <div>
+            <label for="edit-trees">Trees Planted:</label>
+            <input type="number" id="edit-trees" required>
+          </div>
+          <div>
+            <label for="edit-missions">Missions Completed:</label>
+            <input type="number" id="edit-missions" required>
+          </div>
+          <button type="submit" class="save-button">Save Changes</button>
+        </form>
+      </div>
+    </div>
     </main>
 
     <script
@@ -270,7 +344,12 @@
         getDocs,
         doc,
         getDoc,
+        updateDoc,
+        deleteDoc,
+        query,
+        where,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
       // Firebase configuration
       const firebaseConfig = {
@@ -331,24 +410,28 @@
         usersToDisplay.forEach((userData, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
-      <td><img src="${userData.photoURL}" alt="${
-            userData.username
-          }'s photo" /></td>
-      <td>${userData.username}</td>
-      <td>${userData.totalPoints}</td>
-      <td>${userData.totalSteps}</td>
-      <td>${userData.totalTrees}</td>
-      <td>${userData.missionsCompleted}</td>
-      <td class="actions">
-        <button class="action-button view-button" data-uid="${
-          userData.uid
-        }">View</button>
-        <button class="action-button delete-button" data-uid="${
-          userData.uid
-        }" data-index="${startIndex + index}">Delete</button>
-      </td>
-    `;
+            <td><img src="${userData.photoURL}" alt="${userData.username}'s photo" /></td>
+            <td>${userData.username}</td>
+            <td>${userData.totalPoints}</td>
+            <td>${userData.totalSteps}</td>
+            <td>${userData.totalTrees}</td>
+            <td>${userData.missionsCompleted}</td>
+            <td class="actions">
+              <button class="action-button view-button" data-uid="${userData.uid}">View</button>
+              <button class="action-button edit-button" data-uid="${userData.uid}">Edit</button>
+              <button class="action-button delete-button" data-uid="${userData.uid}" data-index="${startIndex + index}">Delete</button>
+            </td>
+          `;
           userList.appendChild(row);
+        });
+
+        // Add event listeners for edit buttons
+        const editButtons = document.querySelectorAll(".edit-button");
+        editButtons.forEach((button) => {
+          button.addEventListener("click", async (event) => {
+            const uid = event.target.getAttribute("data-uid");
+            await showEditForm(uid);
+          });
         });
 
         // Attach event listeners to the view buttons
@@ -370,6 +453,63 @@
           });
         });
       }
+
+      // Add these new functions for editing
+      async function showEditForm(uid) {
+        try {
+          const userRef = doc(db, "users", uid);
+          const userSnap = await getDoc(userRef);
+          
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            
+            // Populate the edit form
+            document.getElementById("edit-uid").value = uid;
+            document.getElementById("edit-username").value = userData.username;
+            document.getElementById("edit-email").value = userData.email;
+            document.getElementById("edit-phone").value = userData.phoneNumber || "";
+            document.getElementById("edit-points").value = userData.totalPoints;
+            document.getElementById("edit-steps").value = userData.totalSteps;
+            document.getElementById("edit-trees").value = userData.totalTrees;
+            document.getElementById("edit-missions").value = userData.missionsCompleted;
+            
+            // Show the edit modal
+            document.getElementById("edit-modal").style.display = "flex";
+          }
+        } catch (error) {
+          console.error("Error fetching user for edit: ", error);
+          alert("Error loading user data");
+        }
+      }
+
+      // Add form submission handler
+      document.getElementById("edit-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const uid = document.getElementById("edit-uid").value;
+        const updatedData = {
+          username: document.getElementById("edit-username").value,
+          email: document.getElementById("edit-email").value,
+          phoneNumber: document.getElementById("edit-phone").value,
+          totalPoints: parseInt(document.getElementById("edit-points").value),
+          totalSteps: parseInt(document.getElementById("edit-steps").value),
+          totalTrees: parseInt(document.getElementById("edit-trees").value),
+          missionsCompleted: parseInt(document.getElementById("edit-missions").value)
+        };
+
+        try {
+          const userRef = doc(db, "users", uid);
+          await updateDoc(userRef, updatedData);
+          alert("User updated successfully");
+          document.getElementById("edit-modal").style.display = "none";
+          
+          // Refresh the user list
+          await fetchUsers();
+        } catch (error) {
+          console.error("Error updating user: ", error);
+          alert("Error updating user");
+        }
+      });
 
       // Function to display user details in the modal
       async function showUserDetails(uid) {
@@ -433,21 +573,35 @@
         });
       });
 
-      // Function to delete a user from Firestore
+      // Modify the deleteUser function to handle related data
       async function deleteUser(uid, index) {
-        if (confirm("Are you sure you want to delete this user?")) {
+        if (confirm("Are you sure you want to delete this user? This will delete all their data.")) {
           try {
+            // Delete user document
             const userRef = doc(db, "users", uid);
             await deleteDoc(userRef);
-            alert(`User deleted successfully.`);
 
-            // Remove user from the users array and refresh display
+            // Delete related data from other collections
+            // Delete user's missions
+            const missionsQuery = query(collection(db, "missions"), where("userId", "==", uid));
+            const missionsSnapshot = await getDocs(missionsQuery);
+            const deleteMissions = missionsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            
+            // Delete user's tree records
+            const treesQuery = query(collection(db, "trees"), where("userId", "==", uid));
+            const treesSnapshot = await getDocs(treesQuery);
+            const deleteTrees = treesSnapshot.docs.map(doc => deleteDoc(doc.ref));
+
+            // Wait for all deletions to complete
+            await Promise.all([...deleteMissions, ...deleteTrees]);
+
+            alert("User and related data deleted successfully.");
             users.splice(index, 1);
-            displayUsers(currentPage); // Re-render the user list after deletion
-            updatePaginationControls(); // Update pagination after deleting
+            displayUsers(currentPage);
+            updatePaginationControls();
           } catch (error) {
             console.error("Error deleting user: ", error);
-            alert("Failed to delete user.");
+            alert("Failed to delete user and related data.");
           }
         }
       }

@@ -144,6 +144,38 @@
         font-size: 0.9em;
         color: #666;
       }
+      /* Add new styles for batch update features */
+      .batch-controls {
+        margin-bottom: 1em;
+        display: flex;
+        gap: 1em;
+        align-items: center;
+      }
+
+      .checkbox-cell {
+        width: 40px;
+        text-align: center;
+      }
+
+      #batch-update-button {
+        background-color: #4aad5b;
+        color: white;
+        padding: 0.5em 1em;
+        border: none;
+        border-radius: 0.3em;
+        cursor: pointer;
+        display: none;
+      }
+
+      #batch-update-button.visible {
+        display: inline-block;
+      }
+
+      .select-all-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+      }
     </style>
   </head>
   <body>
@@ -156,9 +188,19 @@
     <main>
       <div class="plant-requests-container">
         <h2>Plant Requests</h2>
+        <div class="batch-controls">
+          <div class="select-all-container">
+            <input type="checkbox" id="select-all" />
+            <label for="select-all">Select All Pending</label>
+          </div>
+          <button id="batch-update-button" class="action-button">
+            Update Selected Requests
+          </button>
+        </div>
         <table id="plant-requests-table">
           <thead>
             <tr>
+              <th class="checkbox-cell"></th>
               <th>Username</th>
               <th>Tree Name</th>
               <th>Tree Type</th>
@@ -178,11 +220,11 @@
       </div>
     </main>
 
-    <!-- Modal for updating plant request -->
+    <!-- Modified update modal -->
     <div id="update-modal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>Update Plant Request</h2>
+        <h2>Update Plant Request(s)</h2>
         <form id="update-form">
           <label for="status">Status:</label>
           <select id="status" name="status">
@@ -198,6 +240,7 @@
           <label for="long">Longitude:</label>
           <input type="text" id="long" name="long" readonly />
           <br /><br />
+          <p id="selected-count"></p>
           <button type="submit" class="action-button">Update</button>
         </form>
       </div>
@@ -227,6 +270,7 @@
         startAfter,
         endBefore,
         limitToLast,
+        getDoc,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       // Firebase configuration
@@ -273,30 +317,35 @@
       let currentPlantRequest;
       let selectedRequests = new Set();
 
-      // Modified initMap function
+      // Modified initMap function with clearer location priority
       function initMap(lat = null, lng = null, existingMarker = null) {
         if (map) {
           map.remove();
         }
 
+        // Initialize map with default center (will be updated)
+        map = L.map("map").setView([0, 0], 13);
+
+        // Add tile layer
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
         if (existingMarker) {
-          // Use existing marker location
-          map = L.map("map").setView(
-            [existingMarker.lat, existingMarker.lng],
-            13
-          );
+          // Case 1: Use existing marker location
+          map.setView([existingMarker.lat, existingMarker.lng], 13);
           marker = L.marker([existingMarker.lat, existingMarker.lng]).addTo(
             map
           );
           updateCoordinateInputs(existingMarker.lat, existingMarker.lng);
         } else if (lat && lng) {
-          // Use provided coordinates
-          map = L.map("map").setView([lat, lng], 13);
+          // Case 2: Use provided coordinates
+          map.setView([lat, lng], 13);
           marker = L.marker([lat, lng]).addTo(map);
           updateCoordinateInputs(lat, lng);
         } else {
-          // Get current location only if no existing marker
-          map = L.map("map").setView([0, 0], 13);
+          // Case 3: No existing coordinates, use device location
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
               (position) => {
@@ -308,20 +357,17 @@
               },
               () => {
                 console.error("Error getting location");
+                // Set default view if geolocation fails
+                map.setView([0, 0], 13);
               }
             );
           }
         }
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(map);
-
         map.on("click", onMapClick);
       }
 
-      // Helper function to update coordinate inputs
+      // Helper function to update coordinate inputs (unchanged)
       function updateCoordinateInputs(lat, lng) {
         document.getElementById("lat").value = lat.toFixed(6);
         document.getElementById("long").value = lng.toFixed(6);
@@ -386,7 +432,7 @@
         pageInfo.textContent = `Page ${currentPage}`;
       }
 
-      // Display plant requests in the table
+      // Modified displayPlantRequests function to include checkboxes
       function displayPlantRequests(plantRequests) {
         const tableBody = document.getElementById("plant-requests-body");
         tableBody.innerHTML = "";
@@ -394,30 +440,105 @@
         plantRequests.forEach((request) => {
           const timestamp = request.timestamp?.toDate() || new Date();
           const formattedDate = timestamp.toLocaleString();
+          const isPending = request.plantingStatus === "pending";
 
           const row = document.createElement("tr");
+          row.setAttribute("data-request-id", request.id);
           row.innerHTML = `
-            <td>${request.username}</td>
-            <td>${request.treeName}</td>
-            <td>${request.treeType}</td>
-            <td>${request.treeCost}</td>
-            <td>${request.plantingStatus}</td>
-            <td class="timestamp">${formattedDate}</td>
-            <td>
-              <button class="action-button update-button" data-id="${request.id}">Update</button>
-            </td>
-          `;
+             <td class="checkbox-cell">
+               ${
+                 isPending
+                   ? `<input type="checkbox" class="request-checkbox" data-id="${request.id}"/>`
+                   : ""
+               }
+             </td>
+             <td>${request.username}</td>
+             <td>${request.treeName}</td>
+             <td>${request.treeType}</td>
+             <td>${request.treeCost}</td>
+             <td data-field="status">${request.plantingStatus}</td>
+             <td class="timestamp">${formattedDate}</td>
+             <td>
+               <button class="action-button update-button" data-id="${
+                 request.id
+               }">Update</button>
+             </td>
+           `;
           tableBody.appendChild(row);
         });
 
-        // Add event listeners to update buttons
+        // Add event listeners
+        setupEventListeners();
+      }
+
+      // Setup event listeners for checkboxes and buttons
+      function setupEventListeners() {
+        // Single update buttons
         const updateButtons = document.querySelectorAll(".update-button");
         updateButtons.forEach((button) => {
           button.addEventListener("click", (event) => {
+            selectedRequests.clear();
             const requestId = event.target.getAttribute("data-id");
-            openUpdateModal(requestId);
+            openUpdateModal([requestId]);
           });
         });
+
+        // Checkbox change events
+        const checkboxes = document.querySelectorAll(".request-checkbox");
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", handleCheckboxChange);
+        });
+
+        // Select all checkbox
+        const selectAllCheckbox = document.getElementById("select-all");
+        selectAllCheckbox.addEventListener("change", handleSelectAll);
+
+        // Batch update button
+        const batchUpdateButton = document.getElementById(
+          "batch-update-button"
+        );
+        batchUpdateButton.addEventListener("click", () => {
+          if (selectedRequests.size > 0) {
+            openUpdateModal(Array.from(selectedRequests));
+          }
+        });
+      }
+
+      // Handle individual checkbox changes
+      function handleCheckboxChange(event) {
+        const requestId = event.target.getAttribute("data-id");
+        if (event.target.checked) {
+          selectedRequests.add(requestId);
+        } else {
+          selectedRequests.delete(requestId);
+        }
+        updateBatchControls();
+      }
+
+      // Handle select all checkbox
+      function handleSelectAll(event) {
+        const checkboxes = document.querySelectorAll(".request-checkbox");
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = event.target.checked;
+          const requestId = checkbox.getAttribute("data-id");
+          if (event.target.checked) {
+            selectedRequests.add(requestId);
+          } else {
+            selectedRequests.delete(requestId);
+          }
+        });
+        updateBatchControls();
+      }
+
+      // Update batch controls visibility
+      function updateBatchControls() {
+        const batchUpdateButton = document.getElementById(
+          "batch-update-button"
+        );
+        batchUpdateButton.classList.toggle(
+          "visible",
+          selectedRequests.size > 0
+        );
       }
 
       // Add pagination event listeners
@@ -431,56 +552,46 @@
         fetchPlantRequests("next");
       });
 
-      // Modify the openUpdateModal function to load existing data
-      async function openUpdateModal(requestId) {
+      // Modified openUpdateModal function to handle coordinates
+      async function openUpdateModal(requestIds) {
         const modal = document.getElementById("update-modal");
         modal.style.display = "block";
 
+        document.getElementById(
+          "selected-count"
+        ).textContent = `Selected Requests: ${requestIds.length}`;
+
         try {
-          // Fetch the current plant request data
-          const querySnapshot = await getDocs(collection(db, "plant_requests"));
-          const plantRequest = querySnapshot.docs
-            .find((doc) => doc.id === requestId)
-            ?.data();
+          // Get the first request's details to check for existing coordinates
+          const requestRef = doc(db, "plant_requests", requestIds[0]);
+          const requestDoc = await getDoc(requestRef);
+          const requestData = requestDoc.data();
 
-          if (plantRequest) {
-            currentPlantRequest = { ...plantRequest, id: requestId };
-
-            // Set the current status
-            document.getElementById("status").value =
-              plantRequest.plantingStatus || "pending";
-
-            // Initialize map with existing location if available
-            if (plantRequest.locationLat && plantRequest.locationLong) {
-              const lat = parseFloat(plantRequest.locationLat);
-              const lng = parseFloat(plantRequest.locationLong);
-              initMap(lat, lng, { lat, lng });
-            } else {
-              // If no location is set, use current location or default
-              if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                  (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    initMap(lat, lng);
-                  },
-                  () => initMap()
-                );
-              } else {
-                initMap();
+          // Initialize map based on existing coordinates or device location
+          if (requestData.locationLat && requestData.locationLong) {
+            // Use saved coordinates
+            initMap(
+              parseFloat(requestData.locationLat),
+              parseFloat(requestData.locationLong),
+              {
+                lat: parseFloat(requestData.locationLat),
+                lng: parseFloat(requestData.locationLong),
               }
-            }
+            );
+          } else {
+            // No saved coordinates, initialize with device location
+            initMap();
           }
-        } catch (error) {
-          console.error("Error fetching plant request data:", error);
-          initMap(); // Initialize map with default values if there's an error
-        }
 
-        // Set up form submission
-        document.getElementById("update-form").onsubmit = (e) => {
-          e.preventDefault();
-          updatePlantRequest(requestId);
-        };
+          // Set up form submission for batch update
+          document.getElementById("update-form").onsubmit = (e) => {
+            e.preventDefault();
+            updatePlantRequests(requestIds);
+          };
+        } catch (error) {
+          console.error("Error opening update modal:", error);
+          alert("Error opening update modal");
+        }
       }
 
       // Update the onMapClick function to handle marker updates
@@ -500,6 +611,89 @@
         }
       }
 
+      // Modified updatePlantRequests function to reset UI elements
+      async function updatePlantRequests(requestIds) {
+        const status = document.getElementById("status").value;
+        const lat = document.getElementById("lat").value;
+        const long = document.getElementById("long").value;
+
+        if (!lat || !long) {
+          alert("Please select a location on the map before updating.");
+          return;
+        }
+
+        try {
+          // Update each selected request
+          const updatePromises = requestIds.map((requestId) => {
+            const requestRef = doc(db, "plant_requests", requestId);
+            return updateDoc(requestRef, {
+              plantingStatus: status,
+              locationLat: lat,
+              locationLong: long,
+            });
+          });
+
+          await Promise.all(updatePromises);
+
+          // Update UI for each updated request
+          requestIds.forEach((requestId) => {
+            const tableRow = document
+              .querySelector(`button[data-id="${requestId}"]`)
+              .closest("tr");
+            if (tableRow) {
+              const statusCell = tableRow.querySelector(
+                '[data-field="status"]'
+              );
+              if (statusCell) {
+                statusCell.textContent = status;
+              }
+
+              // Handle checkbox cell
+              const checkboxCell = tableRow.querySelector(".checkbox-cell");
+              if (checkboxCell) {
+                if (status === "pending") {
+                  // Add checkbox if status is pending
+                  if (!checkboxCell.querySelector(".request-checkbox")) {
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.className = "request-checkbox";
+                    checkbox.setAttribute("data-id", requestId);
+                    checkbox.addEventListener("change", handleCheckboxChange);
+                    checkboxCell.appendChild(checkbox);
+                  }
+                } else {
+                  // Remove checkbox if status is not pending
+                  const checkbox =
+                    checkboxCell.querySelector(".request-checkbox");
+                  if (checkbox) {
+                    checkbox.remove();
+                  }
+                }
+              }
+            }
+          });
+
+          // Reset select all checkbox
+          const selectAllCheckbox = document.getElementById("select-all");
+          if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+          }
+
+          // Clear selected requests and update controls
+          selectedRequests.clear();
+          updateBatchControls();
+
+          alert("Plant requests updated successfully");
+          closeModal();
+
+          // Refresh the page data to ensure consistency
+          await fetchPlantRequests();
+        } catch (error) {
+          console.error("Error updating plant requests: ", error);
+          alert("Failed to update plant requests");
+        }
+      }
+
       // Clean up when closing the modal
       function closeModal() {
         document.getElementById("update-modal").style.display = "none";
@@ -513,7 +707,7 @@
       // Update the modal close button event listener
       document.querySelector(".close").onclick = closeModal;
 
-      // Update the updatePlantRequest function
+      // Modified updatePlantRequest function for single updates
       async function updatePlantRequest(requestId) {
         const status = document.getElementById("status").value;
         const lat = document.getElementById("lat").value;
@@ -532,9 +726,45 @@
             locationLong: long,
           });
 
+          // Update the table row directly
+          const tableRow = document
+            .querySelector(`button[data-id="${requestId}"]`)
+            .closest("tr");
+          if (tableRow) {
+            const statusCell = tableRow.querySelector('[data-field="status"]');
+            if (statusCell) {
+              statusCell.textContent = status;
+            }
+
+            // Handle checkbox cell
+            const checkboxCell = tableRow.querySelector(".checkbox-cell");
+            if (checkboxCell) {
+              if (status === "pending") {
+                // Add checkbox if status is pending
+                if (!checkboxCell.querySelector(".request-checkbox")) {
+                  const checkbox = document.createElement("input");
+                  checkbox.type = "checkbox";
+                  checkbox.className = "request-checkbox";
+                  checkbox.setAttribute("data-id", requestId);
+                  checkbox.addEventListener("change", handleCheckboxChange);
+                  checkboxCell.appendChild(checkbox);
+                }
+              } else {
+                // Remove checkbox if status is not pending
+                const checkbox =
+                  checkboxCell.querySelector(".request-checkbox");
+                if (checkbox) {
+                  checkbox.remove();
+                }
+              }
+            }
+          }
+
           alert("Plant request updated successfully");
           closeModal();
-          fetchPlantRequests(); // Refresh the table
+
+          // Refresh the page data to ensure consistency
+          await fetchPlantRequests();
         } catch (error) {
           console.error("Error updating plant request: ", error);
           alert("Failed to update plant request");
