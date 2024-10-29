@@ -1,1 +1,2 @@
-# TreeStride: A hybrid-based application for fitnesss and environmental conservation
+# TreeStride
+### A hybrid-based application for fitnesss and environmental conservation
