@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TreeStride - Plant Request Management</title>
+    <title>TreeStride - Manage Plant Request</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -27,14 +27,17 @@
       header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         background: #fff;
         color: #444;
-        padding: 1em;
+        padding: 1rem;
       }
       header h1 {
-        margin: 0;
+        margin-left: 2rem;
+      }
+      header a {
+        font-size: 1.4rem;
+        color: #444;
       }
       .sign-out-button {
         background: none;
@@ -180,11 +183,10 @@
   </head>
   <body>
     <header>
-      <h1>Plant Request Management</h1>
-      <button class="sign-out-button" id="sign-out">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
+      <a href="dashboard.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Manage Plant Request</h1>
     </header>
+
     <main>
       <div class="plant-requests-container">
         <h2>Plant Requests</h2>
