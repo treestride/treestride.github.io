@@ -85,7 +85,7 @@
       th,
       td {
         padding: 1em;
-        border: 1px solid #ddd;
+        border-bottom: 1px solid silver;
       }
 
       table img {
@@ -210,6 +210,13 @@
         cursor: pointer;
         margin-top: 1rem;
       }
+      .users-stats {
+        text-align: center;
+        margin-bottom: 1rem;
+        font-size: 1.2em;
+        color: #3a9249;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -231,15 +238,21 @@
           <button onclick="window.location.href ='manage_trees.html'">
             MANAGE TREES
           </button>
-          <button onclick="window.location.href ='plant_request.html'">
+          <button onclick="window.location.href ='tree_requests.html'">
+            MANAGE TREE REQUEST
+          </button>
+          <button onclick="window.location.href ='plant_requests.html'">
             PLANT REQUESTS
           </button>
-          <button onclick="window.location.href ='reported_post.html'">
+          <button onclick="window.location.href ='reported_posts.html'">
             REPORTED POST
           </button>
         </section>
         <section class="user-list">
           <h1>User List</h1>
+          <div class="users-stats">
+            Total Users: <span id="total-users-count">0</span>
+          </div>
           <div class="users-table-container">
             <table id="user-table">
               <thead>
@@ -385,7 +398,6 @@
             fetchUsers();
           }
         } else {
-          alert("Redirecting to login.");
           window.location.href = "index.html";
         }
       });
@@ -402,6 +414,10 @@
           return { uid: doc.id, ...doc.data() };
         });
         totalUsers = users.length;
+
+        // Update the total users count display
+        document.getElementById("total-users-count").textContent = totalUsers;
+
         displayUsers(currentPage);
         updatePaginationControls();
       }
