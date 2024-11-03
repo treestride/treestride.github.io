@@ -15,245 +15,406 @@
         padding: 0;
         margin: 0;
       }
+
+      :root {
+        --primary-color: #38a169;
+        --primary-hover: #2f855a;
+        --danger-color: #e53e3e;
+        --warning-color: #d69e2e;
+        --text-primary: #2d3748;
+        --text-secondary: #4a5568;
+        --bg-primary: #f7fafc;
+        --bg-secondary: #fff;
+        --border-color: #e2e8f0;
+      }
+
       body {
-        background: #f4f7fa;
-        color: #444;
+        background: var(--bg-primary);
+        color: var(--text-primary);
       }
-      header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        background: #fff;
-        color: #444;
-        padding: 1em;
-      }
-      header h1 {
-        margin: 0;
-      }
+
       .sign-out-button {
-        background: none;
-        border: none;
-        color: #444;
-        cursor: pointer;
-        font-size: 1.2em;
         display: flex;
         align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
       }
-      .sign-out-button i {
-        margin-right: 0.5em;
+
+      .sign-out-button:hover {
+        background: #edf2f7;
       }
+
+      /* Navigation Styles */
       .navigation {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, 250px);
-        justify-content: space-evenly;
-        align-items: center;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-        row-gap: 1rem;
-      }
-      .navigation button {
-        padding: 2.4em;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        background: #3a9249;
-        color: #fff;
-        border: 2px solid #4fbb61;
-        border-radius: 1em;
-        font-size: 1rem;
-        transition: all 0.3s ease-in;
-      }
-      .navigation button:hover {
-        transform: scale(1.06);
-      }
-      .users-table-container {
-        width: 80%;
-        margin: auto;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
-        border-radius: 14px;
-        margin-bottom: 2rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-color);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 1em;
+      .navigation a {
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s;
       }
 
-      th,
-      td {
-        padding: 1em;
-        border-bottom: 1px solid silver;
+      .navigation a:hover {
+        background: var(--bg-primary);
+        color: var(--primary-color);
       }
 
-      table img {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
+      .navigation a i {
+        margin-right: 0.4rem;
       }
 
+      /* Main Content Styles */
+      main {
+        margin-left: 250px;
+        padding: 1rem;
+      }
+
+      .user-list h1 {
+        font-weight: 600;
+        margin-bottom: 1.4rem;
+        color: var(--text-primary);
+      }
+
+      .users-stats {
+        background: var(--bg-secondary);
+        padding: 1.2rem;
+        border-radius: 0.4rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.2rem;
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      /* Pagination Styles */
       #pagination-controls {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 1em;
+        gap: 1rem;
+        margin-top: 1rem;
       }
 
       #pagination-controls button {
-        padding: 0.5em 1em;
-        margin: 0 0.5em;
-        border: none;
-        background-color: #4fbb61;
-        border-radius: 0.3em;
+        padding: 0.4rem 1rem;
+        background: var(--primary-color);
         color: white;
+        border: none;
+        border-radius: 0.4rem;
+        font-weight: 500;
         cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      #pagination-controls button:hover:not(:disabled) {
+        background: var(--primary-hover);
       }
 
       #pagination-controls button:disabled {
-        background-color: #ccc;
+        background: #cbd5e0;
+        cursor: not-allowed;
       }
 
       #page-info {
-        font-size: 1em;
+        color: var(--text-secondary);
+        font-weight: 500;
       }
 
-      .action-button {
-        padding: 0.5em 1em;
-        border: none;
-        cursor: pointer;
-        font-size: 0.8em;
-        border-radius: 0.3em;
-      }
-
-      .view-button {
-        background-color: #4aad5b;
-        color: white;
-      }
-
-      .delete-button {
-        background-color: #d9534f;
-        color: white;
-      }
-
+      /* Modal Styles */
       .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: grid;
-        justify-content: center;
-        align-items: center;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
       }
 
       .modal-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 360px;
-        text-align: center;
-      }
-      .modal-content h2 {
-        margin-bottom: 1rem;
-      }
-      .close {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 1.5em;
-        cursor: pointer;
+        background: var(--bg-secondary);
+        border-radius: 0.4rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
       }
 
-      #user-details {
-        display: grid;
-        row-gap: 1rem;
-      }
-      #user-details img {
-        width: 120px;
-        height: 120px;
-      }
-      .user-list h1 {
-        text-align: center;
-        margin-bottom: 1rem;
-      }
-      .actions {
-        display: grid;
-        gap: 1rem;
-      }
-      .edit-button {
-        background-color: #ffc107;
-        color: white;
+      .modal-content h2 {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
       }
 
       .modal-form {
         display: grid;
         gap: 1rem;
-        text-align: left;
+      }
+
+      .modal-form label {
+        font-weight: 500;
+        color: var(--text-secondary);
       }
 
       .modal-form input {
-        padding: 0.5em;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.4rem;
         width: 100%;
       }
 
-      .save-button {
-        background-color: #4aad5b;
-        color: white;
-        padding: 0.5em 1em;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 1rem;
+      .modal-form input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
       }
-      .users-stats {
-        text-align: center;
+
+      .save-button {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 0.4rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .save-button:hover {
+        background: var(--primary-hover);
+      }
+
+      .close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .close:hover {
+        color: var(--text-primary);
+      }
+
+      /* Table Container Styles */
+      .users-table-container {
+        background: var(--bg-secondary);
+        border-radius: 0.4rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        overflow-x: auto;
+      }
+
+      /* User Details Styles */
+      #user-details img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto;
+        display: block;
+        object-fit: cover;
+      }
+
+      #user-details p {
+        margin: 1rem 0;
+        color: var(--text-secondary);
+      }
+
+      #user-details strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      .actions {
+        display: grid;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .view-button {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .view-button:hover {
+        background: var(--primary-hover);
+      }
+
+      .edit-button {
+        background: var(--warning-color);
+        color: white;
+      }
+
+      .edit-button:hover {
+        background: #b7791f;
+      }
+
+      .delete-button {
+        background: var(--danger-color);
+        color: white;
+      }
+
+      .delete-button:hover {
+        background: #c53030;
+      }
+
+      /* Table Base Styles */
+      #user-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
         margin-bottom: 1rem;
-        font-size: 1.2em;
-        color: #3a9249;
-        font-weight: bold;
+      }
+
+      /* Table Header Styles */
+      #user-table th {
+        padding: 1rem;
+        text-align: center;
+        background-color: var(--bg-primary);
+        border-bottom: 2px solid var(--border-color);
+        color: var(--text-primary);
+      }
+
+      #user-table img {
+        height: 48px;
+        width: 48px;
+      }
+
+      /* Table Body Styles */
+      #user-table tbody tr {
+        transition: background-color 0.2s ease;
+      }
+
+      #user-table tbody tr:hover {
+        background-color: var(--bg-primary);
+      }
+
+      #user-table tbody td {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        vertical-align: middle;
+      }
+
+      /* Table Image Styles */
+      #user-table tbody td img {
+        height: 48px;
+        width: 48px;
+        object-fit: cover;
+      }
+
+      /* Actions Column Styles */
+      #user-table .actions {
+        display: grid;
+        gap: 0.4rem;
+        justify-content: center;
+      }
+
+      .action-button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .empty-state {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+        background: var(--bg-secondary);
+        border-radius: 0.4rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .empty-state i {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+      }
+
+      .empty-state h3 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .empty-state p {
+        color: var(--text-secondary);
+      }
+
+      #user-table {
+        display: none;
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>Admin Dashboard</h1>
-      <button class="sign-out-button" id="sign-out">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
-    </header>
     <main>
-      <section class="two-col">
+      <section class="two-column">
         <section class="navigation">
-          <button onclick="window.location.href ='announcements.html'">
-            ANNOUNCEMENTS
+          <h1
+            style="
+              font-size: 2rem;
+              text-align: center;
+              margin-bottom: 1rem;
+              font-weight: bold;
+            "
+          >
+            Admin Dashboard
+          </h1>
+          <button class="sign-out-button" id="sign-out">
+            <i class="fas fa-sign-out-alt"></i> Sign Out
           </button>
-          <button onclick="window.location.href ='manage_mission.html'">
-            MANAGE MISSION
-          </button>
-          <button onclick="window.location.href ='manage_trees.html'">
-            MANAGE TREES
-          </button>
-          <button onclick="window.location.href ='tree_requests.html'">
-            MANAGE TREE REQUEST
-          </button>
-          <button onclick="window.location.href ='plant_requests.html'">
-            PLANT REQUESTS
-          </button>
-          <button onclick="window.location.href ='reported_posts.html'">
-            REPORTED POST
-          </button>
+          <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+          <a href="announcements.html"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
+          <a href="manage_mission.html"
+            ><i class="fas fa-tasks"></i> Manage Mission</a
+          >
+          <a href="manage_trees.html"
+            ><i class="fas fa-tree"></i> Manage Trees</a
+          >
+          <a href="planting_requests.html"
+            ><i class="fas fa-seedling"></i> Planting Requests</a
+          >
+          <a href="tree_requests.html"
+            ><i class="fas fa-hand-paper"></i> Tree Requests</a
+          >
+          <a href="reported_posts.html"
+            ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+          >
         </section>
+
+        <h1 style="margin-bottom: 1rem; font-size: 2rem; text-align: center">
+          TreeStride Users
+        </h1>
         <section class="user-list">
-          <h1>User List</h1>
           <div class="users-stats">
             Total Users: <span id="total-users-count">0</span>
           </div>
           <div class="users-table-container">
+            <!-- Add this empty state div before the table -->
+            <div id="empty-state" class="empty-state">
+              <i class="fas fa-users-slash"></i>
+              <h3>No Users Found</h3>
+              <p>There are currently no users registered in the system.</p>
+            </div>
             <table id="user-table">
               <thead>
                 <tr>
@@ -404,7 +565,7 @@
 
       // Variables for pagination
       let currentPage = 1;
-      const usersPerPage = 5;
+      const usersPerPage = 4;
       let totalUsers = 0;
       let users = [];
 
@@ -418,8 +579,24 @@
         // Update the total users count display
         document.getElementById("total-users-count").textContent = totalUsers;
 
-        displayUsers(currentPage);
-        updatePaginationControls();
+        // Show/hide empty state and table based on users array
+        const emptyState = document.getElementById("empty-state");
+        const userTable = document.getElementById("user-table");
+        const paginationControls = document.getElementById(
+          "pagination-controls"
+        );
+
+        if (totalUsers === 0) {
+          emptyState.style.display = "block";
+          userTable.style.display = "none";
+          paginationControls.style.display = "none";
+        } else {
+          emptyState.style.display = "none";
+          userTable.style.display = "table";
+          paginationControls.style.display = "flex";
+          displayUsers(currentPage);
+          updatePaginationControls();
+        }
       }
 
       function displayUsers(page) {
@@ -593,9 +770,12 @@
 
       // Close the modal when clicking outside the modal content
       window.onclick = (event) => {
-        const modal = document.getElementById("user-modal");
-        if (event.target == modal) {
-          modal.style.display = "none";
+        const userModal = document.getElementById("user-modal");
+        const editModal = document.getElementById("edit-modal");
+        if (event.target == userModal) {
+          userModal.style.display = "none";
+        } else if (event.target == editModal) {
+          editModal.style.display = "none";
         }
       };
 
@@ -610,7 +790,6 @@
         });
       });
 
-      // Modify the deleteUser function to handle related data
       async function deleteUser(uid, index) {
         if (
           confirm(
@@ -646,10 +825,19 @@
             // Wait for all deletions to complete
             await Promise.all([...deleteMissions, ...deleteTrees]);
 
-            alert("User and related data deleted successfully.");
+            // Update users array and total count
             users.splice(index, 1);
+            totalUsers = users.length;
+
+            // Update the total users count display
+            document.getElementById("total-users-count").textContent =
+              totalUsers;
+
+            // Update the display and pagination
             displayUsers(currentPage);
             updatePaginationControls();
+
+            alert("User and related data deleted successfully.");
           } catch (error) {
             console.error("Error deleting user: ", error);
             alert("Failed to delete user and related data.");

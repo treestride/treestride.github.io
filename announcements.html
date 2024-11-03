@@ -20,45 +20,98 @@
         padding: 0;
         margin: 0;
       }
-      body {
-        background: #f4f7fa;
-        color: #444;
+
+      :root {
+        --primary-color: #38a169;
+        --primary-hover: #2f855a;
+        --danger-color: #e53e3e;
+        --warning-color: #d69e2e;
+        --text-primary: #2d3748;
+        --text-secondary: #4a5568;
+        --bg-primary: #f7fafc;
+        --bg-secondary: #fff;
+        --border-color: #e2e8f0;
       }
-      header {
+
+      body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+      }
+
+      /* Main Content Styles */
+      main {
+        margin-left: 250px;
+        padding: 1rem;
+      }
+
+      .sign-out-button {
         display: flex;
         align-items: center;
-        padding: 1rem;
-        background-color: #fefefe;
-        color: #444;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
       }
-      header h1 {
-        margin-left: 2rem;
+
+      .sign-out-button:hover {
+        background: #edf2f7;
       }
-      header a {
-        font-size: 1.4rem;
-        color: #444;
+
+      /* Navigation Styles */
+      .navigation {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-color);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
+
+      .navigation a {
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .navigation a:hover {
+        background: var(--bg-primary);
+        color: var(--primary-color);
+      }
+
+      .navigation a i {
+        margin-right: 0.4rem;
+      }
+
       .container {
-        max-width: 800px;
-        margin: 0 auto;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
+        width: 100%;
         background: #fff;
-        padding: 20px;
-        border-radius: 8px;
+        padding: 1rem;
+        border-radius: 0.4rem;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
-      h2 {
-        margin-bottom: 20px;
-      }
+
       form {
         display: flex;
         flex-direction: column;
       }
+
       label {
         margin-top: 10px;
       }
+
       input[type="text"],
       textarea {
         width: 100%;
@@ -67,12 +120,13 @@
         border: 1px solid #ddd;
         border-radius: 4px;
       }
+
       #map {
         height: 200px;
         margin-top: 10px;
       }
-      button {
-        margin-top: 20px;
+
+      .container button {
         padding: 10px;
         background-color: #3a9249;
         color: white;
@@ -80,12 +134,11 @@
         border-radius: 4px;
         cursor: pointer;
       }
-      button:hover {
+
+      .container button:hover {
         background-color: #4fbb61;
       }
-      #announcements {
-        margin-top: 40px;
-      }
+
       .announcement {
         position: relative;
         background: #f9f9f9;
@@ -94,20 +147,24 @@
         margin-bottom: 15px;
         border-radius: 4px;
       }
+
       .announcement img {
         max-width: 100%;
         height: auto;
         margin-top: 10px;
       }
+
       .announcement-map {
         height: 200px;
         margin-top: 10px;
       }
+
       .action-buttons {
         position: absolute;
         top: 10px;
         right: 10px;
       }
+
       .edit-btn,
       .delete-btn {
         margin-left: 5px;
@@ -118,14 +175,17 @@
         border-radius: 3px;
         cursor: pointer;
       }
+
       .delete-btn {
         background-color: #f44336;
       }
+
       .pagination {
         display: flex;
         justify-content: center;
         margin-top: 20px;
       }
+
       .pagination button {
         margin: 0 5px;
         padding: 5px 10px;
@@ -135,10 +195,12 @@
         border-radius: 4px;
         cursor: pointer;
       }
+
       .pagination button:disabled {
         background-color: #cccccc;
         cursor: not-allowed;
       }
+
       /* Modal styles */
       .modal {
         display: none;
@@ -168,7 +230,6 @@
       .close {
         color: #aaa;
         float: right;
-        font-size: 28px;
         font-weight: bold;
         cursor: pointer;
       }
@@ -187,7 +248,6 @@
         text-transform: uppercase;
         color: white;
         border: none;
-        font-size: 1rem;
         border-radius: 4px;
         width: 100%;
         cursor: pointer;
@@ -199,25 +259,61 @@
     </style>
   </head>
   <body>
-    <header>
-      <a href="dashboard.html"><i class="fa-solid fa-arrow-left"></i></a>
-      <h1>Announcements</h1>
-    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <h1
+            style="
+              font-size: 2rem;
+              text-align: center;
+              margin-bottom: 1rem;
+              font-weight: bold;
+            "
+          >
+            Admin Dashboard
+          </h1>
+          <button class="sign-out-button" id="sign-out">
+            <i class="fas fa-sign-out-alt"></i> Sign Out
+          </button>
+          <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+          <a href="announcements.html"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
+          <a href="manage_mission.html"
+            ><i class="fas fa-tasks"></i> Manage Mission</a
+          >
+          <a href="manage_trees.html"
+            ><i class="fas fa-tree"></i> Manage Trees</a
+          >
+          <a href="planting_requests.html"
+            ><i class="fas fa-seedling"></i> Planting Requests</a
+          >
+          <a href="tree_requests.html"
+            ><i class="fas fa-hand-paper"></i> Tree Requests</a
+          >
+          <a href="reported_posts.html"
+            ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+          >
+        </section>
 
-    <div class="container">
-      <button id="create-announcement-btn">Create New Announcement</button>
+        <h1 style="margin-bottom: 1rem; font-size: 2rem; text-align: center">
+          Announcements
+        </h1>
+        <div class="container">
+          <button id="create-announcement-btn">Create New Announcement</button>
 
-      <div id="announcements">
-        <h2>Current Announcements</h2>
-        <!-- Announcements will be dynamically added here -->
-      </div>
-      <div class="pagination">
-        <button id="prev-page" disabled>Previous</button>
-        <span id="page-info">Page 1</span>
-        <button id="next-page">Next</button>
-      </div>
-    </div>
-
+          <div id="announcements">
+            <h2>Current Announcements</h2>
+            <!-- Announcements will be dynamically added here -->
+          </div>
+          <div class="pagination">
+            <button id="prev-page" disabled>Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-page">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
     <!-- Modal -->
     <div id="announcement-modal" class="modal">
       <div class="modal-content">
@@ -301,7 +397,7 @@
       const storage = getStorage(app);
 
       let currentPage = 1;
-      const ANNOUNCEMENTS_PER_PAGE = 5;
+      const ANNOUNCEMENTS_PER_PAGE = 4;
       let lastVisible = null;
       let firstVisible = null;
       let totalPages = 0;
@@ -505,6 +601,30 @@
       // Fetch and display announcements
       async function fetchAnnouncements(direction = "next") {
         const announcementsDiv = document.getElementById("announcements");
+
+        // First get the total count
+        const countSnapshot = await getCountFromServer(
+          collection(db, "announcements")
+        );
+        const totalAnnouncements = countSnapshot.data().count;
+
+        // If there are no announcements, show the empty state
+        if (totalAnnouncements === 0) {
+          announcementsDiv.innerHTML = `
+      <h2>Current Announcements</h2>
+      <div style="text-align: center; padding: 40px 20px; background: #f9f9f9; border-radius: 8px; margin-top: 20px;">
+        <i class="fa-regular fa-newspaper" style="font-size: 48px; color: #999; margin-bottom: 16px;"></i>
+        <h3 style="color: #666; margin-bottom: 8px;">No Announcements Yet</h3>
+        <p style="color: #888;">Create your first announcement by clicking the button above.</p>
+      </div>
+    `;
+          // Hide pagination when there's no data
+          document.querySelector(".pagination").style.display = "none";
+          return;
+        }
+
+        // Show pagination if there's data
+        document.querySelector(".pagination").style.display = "flex";
         announcementsDiv.innerHTML = "<h2>Current Announcements</h2>";
 
         let q = query(
@@ -531,9 +651,10 @@
 
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty) {
-          announcementsDiv.innerHTML += "<p>No announcements found.</p>";
-          updatePagination();
+        if (querySnapshot.empty && direction !== "next") {
+          // Handle case where we've paginated too far
+          currentPage--;
+          fetchAnnouncements("next");
           return;
         }
 
@@ -548,7 +669,6 @@
 
         updatePagination();
       }
-
       async function updatePagination() {
         const countSnapshot = await getCountFromServer(
           collection(db, "announcements")
