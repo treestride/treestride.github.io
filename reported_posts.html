@@ -90,64 +90,82 @@
         padding: 1rem;
       }
 
-      .container {
-        max-width: 100%;
-        margin: 0 auto;
-      }
-
-      .post-card {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        background-color: white;
+      /* New table styles */
+      .table-container {
+        background: white;
+        border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-top: 1rem;
+        overflow-x: auto;
       }
 
-      .poster-info {
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      th {
+        background-color: var(--bg-primary);
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background-color: var(--bg-primary);
+      }
+
+      .user-info {
         display: flex;
         align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #eee;
+        gap: 0.5rem;
       }
 
-      .poster-avatar {
-        width: 40px;
-        height: 40px;
+      .user-avatar {
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
-        margin-right: 1rem;
         object-fit: cover;
       }
 
-      .poster-username {
-        font-weight: bold;
-        color: #333;
-      }
-
-      .post-content {
-        margin-bottom: 0.5rem;
-      }
-
-      .post-image {
-        max-width: 100%;
-        height: auto;
+      .post-image-preview {
+        max-width: 100px;
+        max-height: 100px;
         border-radius: 4px;
-        margin: 0.5rem 0;
       }
 
-      .post-meta {
-        color: #666;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
+      /* Pagination styles */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 1rem;
       }
 
-      .report-info {
-        background-color: #fff3e0;
-        padding: 0.5rem;
+      .pagination button {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        background: white;
         border-radius: 4px;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .pagination button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .pagination button.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
       }
 
       .button-group {
@@ -155,55 +173,61 @@
         gap: 0.5rem;
       }
 
-      button {
+      .dismiss-btn {
         padding: 0.5rem 1rem;
+        background-color: var(--warning-color);
+        color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
       }
 
-      .hide-btn {
-        background-color: #ffa000;
-        color: white;
+      .dismiss-btn:hover {
+        background-color: #b7791f;
       }
 
       .delete-btn {
-        background-color: #f44336;
+        padding: 0.5rem 1rem;
+        background-color: var(--danger-color);
         color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
       }
 
-      .loading {
+      .delete-btn:hover {
+        background-color: #c53030;
+      }
+
+      header {
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        justify-content: end;
+        align-items: center;
         display: flex;
-        justify-content: center;
-        padding: 2rem;
-      }
-
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #4aad5b;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
+        gap: 0.4rem;
+        width: 100%;
       }
     </style>
   </head>
   <body>
+    <header>
+      <h3 style="color: #38a169">Admin</h3>
+      <button class="sign-out-button" id="sign-out">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </header>
     <main>
       <section class="two-column">
         <section class="navigation">
+          <img
+            src="denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="120px"
+            width="120px"
+            style="margin: auto"
+          />
           <h1
             style="
               font-size: 2rem;
@@ -212,41 +236,58 @@
               font-weight: bold;
             "
           >
-            Admin Dashboard
+            TreeStride
           </h1>
-          <button class="sign-out-button" id="sign-out">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-          </button>
-          <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
-          <a href="announcements.html"
-            ><i class="fas fa-bullhorn"></i> Announcements</a
+          <a href="main.html"
+            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
           >
           <a href="manage_mission.html"
             ><i class="fas fa-tasks"></i> Manage Mission</a
           >
+          <a href="announcements.html"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
           <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees</a
+            ><i class="fas fa-tree"></i> Manage Trees (App)</a
           >
           <a href="planting_requests.html"
             ><i class="fas fa-seedling"></i> Planting Requests</a
           >
-          <a href="tree_requests.html"
-            ><i class="fas fa-hand-paper"></i> Tree Requests</a
+          <a href="tree_inventory.html"
+            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
           <a href="reported_posts.html"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
           >
         </section>
 
-        <h1 style="text-align: center; font-size: 2rem; margin-bottom: 1rem">
+        <h1 style="text-align: left; font-size: 2rem; margin-bottom: 1.4rem">
           Reported Posts
         </h1>
-        <div class="container">
-          <div id="posts-container">
-            <div class="loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
+        <div class="table-container">
+          <table id="posts-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Content</th>
+                <th>Image</th>
+                <th>Reported By</th>
+                <th>Report Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr>
+                <td colspan="6" class="loading">
+                  <div class="spinner"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination" id="pagination">
+          <!-- Pagination buttons will be inserted here -->
         </div>
       </section>
     </main>
@@ -271,6 +312,8 @@
         where,
         getDocs,
         writeBatch,
+        orderBy,
+        limit,
         Timestamp,
       } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -289,84 +332,199 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // Load reported posts
-      function loadReportedPosts() {
-        const postsContainer = document.getElementById("posts-container");
+      // Pagination state
+      const state = {
+        postsPerPage: 10,
+        currentPage: 1,
+        lastVisible: null,
+        totalPages: 1,
+        allPosts: [],
+      };
 
-        const reportedPostsRef = collection(db, "reported_posts");
+      // Load reported posts with pagination
+      async function loadReportedPosts() {
+        const tableBody = document.getElementById("table-body");
 
-        onSnapshot(
-          reportedPostsRef,
-          (snapshot) => {
-            postsContainer.innerHTML = ""; // Clear existing content
+        try {
+          const reportedPostsRef = collection(db, "reported_posts");
+          const q = query(
+            reportedPostsRef,
+            orderBy("reportedAt", "desc"),
+            limit(state.postsPerPage)
+          );
+
+          const unsubscribe = onSnapshot(q, (snapshot) => {
+            state.allPosts = [];
+            tableBody.innerHTML = "";
 
             snapshot.forEach((doc) => {
               const data = { ...doc.data(), id: doc.id };
-              const postCard = createPostCard(data);
-              postsContainer.appendChild(postCard);
+              state.allPosts.push(data);
+              const row = createTableRow(data);
+              tableBody.appendChild(row);
             });
 
             if (snapshot.empty) {
-              postsContainer.innerHTML = "<p>No reported posts found.</p>";
+              tableBody.innerHTML = `
+                <tr>
+                  <td colspan="6" style="text-align: center;">No reported posts found.</td>
+                </tr>
+              `;
             }
-          },
-          (error) => {
-            console.error("Error loading posts: ", error);
-            postsContainer.innerHTML =
-              "<p>Error loading posts. Please try again.</p>";
-          }
-        );
+
+            // Update pagination
+            if (snapshot.docs.length > 0) {
+              state.lastVisible = snapshot.docs[snapshot.docs.length - 1];
+            }
+            updatePagination();
+          });
+
+          return unsubscribe;
+        } catch (error) {
+          console.error("Error loading posts: ", error);
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center;">Error loading posts. Please try again.</td>
+            </tr>
+          `;
+        }
       }
 
-      function createPostCard(data) {
-        const card = document.createElement("div");
-        card.className = "post-card";
-
+      function createTableRow(data) {
+        const row = document.createElement("tr");
         const reportDate =
           data.reportedAt instanceof Timestamp
             ? data.reportedAt.toDate()
             : new Date();
 
-        card.innerHTML = `
-          ${
-            data.posterPhotoURL
-              ? `
-            <div class="poster-info">
-              <img src="${
+        row.innerHTML = `
+          <td>
+            <div class="user-info">
+              ${
                 data.posterPhotoURL
-              }" alt="Profile" class="poster-avatar">
+                  ? `
+                <img src="${data.posterPhotoURL}" alt="Profile" class="user-avatar">
+              `
+                  : ""
+              }
               <div>
-                <div class="poster-username">${
-                  data.posterUsername || "Unknown User"
-                }</div>
-                <div class="poster-id">User ID: ${data.posterId || "N/A"}</div>
+                <div>${data.posterUsername || "Unknown User"}</div>
               </div>
             </div>
-          `
-              : ""
-          }
-          <div class="post-content">${data.content || ""}</div>
-          ${
-            data.imageUrl
-              ? `<img src="${data.imageUrl}" alt="Post image" class="post-image">`
-              : ""
-          }
-          <div class="report-info">
-            <div>Reported by: ${data.reportedBy || "Anonymous"}</div>
-            <div>Report Date: ${reportDate.toLocaleString()}</div>
-          </div>
-          <div class="button-group">
-            <button class="delete-btn" onclick="window.handleDeletePost('${
-              data.postId
-            }')">
-              <span>🗑️</span> Delete Post
-            </button>
-          </div>
+          </td>
+          <td>${data.content || ""}</td>
+          <td>
+            ${
+              data.imageUrl
+                ? `
+              <img src="${data.imageUrl}" alt="Post image" class="post-image-preview">
+            `
+                : "No image"
+            }
+          </td>
+          <td>${data.reportedBy || "Anonymous"}</td>
+          <td>${reportDate.toLocaleString()}</td>
+          <td>
+            <div class="button-group">
+              <button class="dismiss-btn" onclick="window.handleDismissReport('${
+                data.id
+              }')">
+                ✓ Dismiss
+              </button>
+              <button class="delete-btn" onclick="window.handleDeletePost('${
+                data.postId
+              }')">
+                🗑️ Delete
+              </button>
+            </div>
+          </td>
         `;
 
-        return card;
+        return row;
       }
 
+      async function loadNextPage() {
+        if (!state.lastVisible) return;
+
+        const reportedPostsRef = collection(db, "reported_posts");
+        const q = query(
+          reportedPostsRef,
+          orderBy("reportedAt", "desc"),
+          startAfter(state.lastVisible),
+          limit(state.postsPerPage)
+        );
+
+        const snapshot = await getDocs(q);
+        const tableBody = document.getElementById("table-body");
+        tableBody.innerHTML = "";
+
+        snapshot.forEach((doc) => {
+          const data = { ...doc.data(), id: doc.id };
+          const row = createTableRow(data);
+          tableBody.appendChild(row);
+        });
+
+        if (snapshot.docs.length > 0) {
+          state.lastVisible = snapshot.docs[snapshot.docs.length - 1];
+          state.currentPage++;
+          updatePagination();
+        }
+      }
+
+      async function loadPrevPage() {
+        if (state.currentPage <= 1) return;
+
+        // Implementation for previous page would require keeping track of all document snapshots
+        // This is a simplified version that reloads from the beginning
+        state.currentPage--;
+        await loadReportedPosts();
+      }
+
+      function updatePagination() {
+        const paginationElement = document.getElementById("pagination");
+        paginationElement.innerHTML = `
+          <button onclick="window.handlePrevPage()" ${
+            state.currentPage <= 1 ? "disabled" : ""
+          }>
+            Previous
+          </button>
+          <span>Page ${state.currentPage}</span>
+          <button onclick="window.handleNextPage()" ${
+            state.allPosts.length < state.postsPerPage ? "disabled" : ""
+          }>
+            Next
+          </button>
+        `;
+      }
+
+      // Add new function to dismiss report
+      async function dismissReport(reportId) {
+        try {
+          // Get the report document reference
+          const reportRef = doc(db, "reported_posts", reportId);
+
+          // Delete only the report document
+          await deleteDoc(reportRef);
+
+          alert("Report has been dismissed successfully.");
+        } catch (error) {
+          console.error("Error dismissing report: ", error);
+          alert("Error dismissing report. Please try again.");
+        }
+      }
+
+      // Add handler for dismiss button
+      window.handleDismissReport = (reportId) => {
+        if (
+          confirm(
+            "Are you sure you want to dismiss this report? This will remove it from the reported posts list but keep the original post."
+          )
+        ) {
+          dismissReport(reportId);
+        }
+      };
+
+      // Delete post function remains the same
       async function deletePost(postId) {
         try {
           const postRef = doc(db, "posts", postId);
@@ -379,6 +537,7 @@
         }
       }
 
+      // Remove from reported posts function remains the same
       async function removeFromReportedPosts(postId) {
         try {
           const q = query(
@@ -400,11 +559,29 @@
         }
       }
 
+      // Add handler for dismiss button
+      window.handleDismissReport = (reportId) => {
+        if (
+          confirm(
+            "Are you sure you want to dismiss this report? This will remove it from the reported posts list but keep the original post."
+          )
+        ) {
+          dismissReport(reportId);
+        }
+      };
+
       window.handleDeletePost = (postId) => {
-        if (confirm("Are you sure you want to delete this post?")) {
+        if (
+          confirm(
+            "Are you sure you want to delete this post? This will permanently remove the post and cannot be undone."
+          )
+        ) {
           deletePost(postId);
         }
       };
+
+      window.handleNextPage = loadNextPage;
+      window.handlePrevPage = loadPrevPage;
 
       // Load posts when page loads
       document.addEventListener("DOMContentLoaded", loadReportedPosts);

@@ -282,12 +282,36 @@
         font-size: 1.5rem;
         cursor: pointer;
       }
+
+      header {
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        justify-content: end;
+        align-items: center;
+        display: flex;
+        gap: 0.4rem;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
+    <header>
+      <h3 style="color: #38a169">Admin</h3>
+      <button class="sign-out-button" id="sign-out">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </header>
     <main>
       <section class="two-column">
         <section class="navigation">
+          <img
+            src="denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="120px"
+            width="120px"
+            style="margin: auto"
+          />
           <h1
             style="
               font-size: 2rem;
@@ -296,36 +320,35 @@
               font-weight: bold;
             "
           >
-            Admin Dashboard
+            TreeStride
           </h1>
           <button id="updateMission">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>
-          <button class="sign-out-button" id="sign-out">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-          </button>
-          <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
-          <a href="announcements.html"
-            ><i class="fas fa-bullhorn"></i> Announcements</a
+          <a href="main.html"
+            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
           >
           <a href="manage_mission.html"
             ><i class="fas fa-tasks"></i> Manage Mission</a
           >
+          <a href="announcements.html"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
           <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees</a
+            ><i class="fas fa-tree"></i> Manage Trees (App)</a
           >
           <a href="planting_requests.html"
             ><i class="fas fa-seedling"></i> Planting Requests</a
           >
-          <a href="tree_requests.html"
-            ><i class="fas fa-hand-paper"></i> Tree Requests</a
+          <a href="tree_inventory.html"
+            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
           <a href="reported_posts.html"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
           >
         </section>
 
-        <h1 style="margin-bottom: 1rem; font-size: 2rem; text-align: center">
+        <h1 style="text-align: left; font-size: 2rem; margin-bottom: 1.4rem">
           Manage Mission
         </h1>
         <section class="mission">
@@ -506,9 +529,20 @@
             // Pre-fill form
             document.getElementById("steps").value = data.steps;
             document.getElementById("reward").value = data.reward;
-            document.getElementById("endDate").value = formatForInput(
-              new Date()
-            );
+
+            // Set the minimum date to either tomorrow or the day after current mission end date
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dayAfterMissionEnd = new Date(endDate);
+            dayAfterMissionEnd.setDate(dayAfterMissionEnd.getDate() + 1);
+
+            // Use the later date between tomorrow and day after mission end
+            const minDate =
+              tomorrow > dayAfterMissionEnd ? tomorrow : dayAfterMissionEnd;
+
+            const dateInput = document.getElementById("endDate");
+            dateInput.min = formatForInput(minDate);
+            dateInput.value = formatForInput(minDate); // Set default value to minimum allowed date
 
             // Load users after getting required steps
             await loadUserProgress();

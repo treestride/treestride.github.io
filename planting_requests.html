@@ -113,6 +113,7 @@
         padding: 1em;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        vertical-align: middle;
       }
 
       th {
@@ -245,12 +246,57 @@
         font-size: 3em;
         color: #ccc;
       }
+      .edit-button {
+        padding: 0.5em 1em;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+        border-radius: 0.3em;
+        background-color: #3182ce; /* Blue color for edit */
+        color: white;
+        margin-right: 0.5em;
+      }
+
+      .edit-button:hover {
+        background-color: #2c5282;
+      }
+
+      .status-cell {
+        display: grid;
+        vertical-align: middle;
+        align-items: center;
+        height: 120px;
+      }
+
+      header {
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        justify-content: end;
+        align-items: center;
+        display: flex;
+        gap: 0.4rem;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
+    <header>
+      <h3 style="color: #38a169">Admin</h3>
+      <button class="sign-out-button" id="sign-out">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </header>
     <main>
       <section class="two-column">
         <section class="navigation">
+          <img
+            src="denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="120px"
+            width="120px"
+            style="margin: auto"
+          />
           <h1
             style="
               font-size: 2rem;
@@ -259,33 +305,32 @@
               font-weight: bold;
             "
           >
-            Admin Dashboard
+            TreeStride
           </h1>
-          <button class="sign-out-button" id="sign-out">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-          </button>
-          <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
-          <a href="announcements.html"
-            ><i class="fas fa-bullhorn"></i> Announcements</a
+          <a href="main.html"
+            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
           >
           <a href="manage_mission.html"
             ><i class="fas fa-tasks"></i> Manage Mission</a
           >
+          <a href="announcements.html"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
           <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees</a
+            ><i class="fas fa-tree"></i> Manage Trees (App)</a
           >
           <a href="planting_requests.html"
             ><i class="fas fa-seedling"></i> Planting Requests</a
           >
-          <a href="tree_requests.html"
-            ><i class="fas fa-hand-paper"></i> Tree Requests</a
+          <a href="tree_inventory.html"
+            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
           <a href="reported_posts.html"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
           >
         </section>
 
-        <h1 style="text-align: center; font-size: 2rem; margin-bottom: 1rem">
+        <h1 style="text-align: left; font-size: 2rem; margin-bottom: 1.4rem">
           Planting Requests
         </h1>
         <div class="plant-requests-container">
@@ -312,6 +357,7 @@
                 <th>Tree Cost</th>
                 <th>Status</th>
                 <th>Requested At</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="plant-requests-body"></tbody>
@@ -346,6 +392,7 @@
           <input type="text" id="long" name="long" readonly />
           <br /><br />
           <p id="selected-count"></p>
+          <button type="submit" class="action-button">Update</button>
         </form>
       </div>
     </div>
@@ -480,48 +527,63 @@
       async function fetchPlantRequests(direction = "next") {
         try {
           let q;
+          const plantRequestsCollection = collection(db, "plant_requests");
 
           if (direction === "next" && lastVisible) {
             q = query(
-              collection(db, "plant_requests"),
+              plantRequestsCollection,
               orderBy("timestamp", "desc"),
               startAfter(lastVisible),
               limit(ITEMS_PER_PAGE)
             );
           } else if (direction === "prev" && firstVisible) {
             q = query(
-              collection(db, "plant_requests"),
+              plantRequestsCollection,
               orderBy("timestamp", "desc"),
               endBefore(firstVisible),
               limitToLast(ITEMS_PER_PAGE)
             );
           } else {
+            // Default query for first page
             q = query(
-              collection(db, "plant_requests"),
+              plantRequestsCollection,
               orderBy("timestamp", "desc"),
               limit(ITEMS_PER_PAGE)
             );
           }
 
           const querySnapshot = await getDocs(q);
-
-          // Hide pagination if there's no data
+          const docs = querySnapshot.docs;
           const paginationDiv = document.querySelector(".pagination");
-          paginationDiv.style.display = querySnapshot.empty ? "none" : "flex";
 
-          if (!querySnapshot.empty) {
-            lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-            firstVisible = querySnapshot.docs[0];
+          // Check if we have any documents
+          if (docs.length > 0) {
+            lastVisible = docs[docs.length - 1];
+            firstVisible = docs[0];
 
-            const plantRequests = querySnapshot.docs.map((doc) => ({
+            const plantRequests = docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
             }));
 
             displayPlantRequests(plantRequests);
+
+            if (paginationDiv) {
+              paginationDiv.style.display = "flex";
+            }
             updatePaginationControls(querySnapshot);
           } else {
-            displayPlantRequests([]);
+            // If no documents found and we're not on the first page
+            if (currentPage > 1) {
+              currentPage--;
+              await fetchPlantRequests("prev");
+            } else {
+              // If we're on the first page and no documents
+              displayPlantRequests([]);
+              if (paginationDiv) {
+                paginationDiv.style.display = "none";
+              }
+            }
           }
         } catch (error) {
           console.error("Error fetching plant requests:", error);
@@ -541,71 +603,89 @@
         pageInfo.textContent = `Page ${currentPage}`;
       }
 
-      // Modified displayPlantRequests function to include checkboxes
       function displayPlantRequests(plantRequests) {
         const tableBody = document.getElementById("plant-requests-body");
+        const batchControls = document.querySelector(".batch-controls");
         tableBody.innerHTML = "";
 
         if (!plantRequests || plantRequests.length === 0) {
-          // Create a row for no data message
           const emptyRow = document.createElement("tr");
           emptyRow.innerHTML = `
-      <td colspan="8" style="text-align: center;">
-        <div style="display: flex; flex-direction: column;">
-          <i class="fa-regular fa-folder-open" style="font-size: 3em; color: #ccc;"></i>
+      <td colspan="7" style="text-align: center;">
+        <div class="empty-state">
+          <i class="fa-regular fa-folder-open"></i>
           <p>No planting requests found</p>
         </div>
       </td>
     `;
           tableBody.appendChild(emptyRow);
 
-          // Hide batch controls when there's no data
-          document.querySelector(".batch-controls").style.display = "none";
+          if (batchControls) {
+            batchControls.style.display = "none";
+          }
           return;
         }
 
-        // Show batch controls when there's data
-        document.querySelector(".batch-controls").style.display = "flex";
+        if (batchControls) {
+          batchControls.style.display = "flex";
+        }
+
+        selectedRequests.clear();
+        updateBatchControls();
 
         plantRequests.forEach((request) => {
+          if (!request) return;
+
           const timestamp = request.timestamp?.toDate() || new Date();
           const formattedDate = timestamp.toLocaleString();
           const isPending = request.plantingStatus === "pending";
+          const isApproved = request.plantingStatus === "approved";
 
           const row = document.createElement("tr");
           row.setAttribute("data-request-id", request.id);
+          row.className = "row";
           row.innerHTML = `
-             <td class="checkbox-cell">
-               ${
-                 isPending
-                   ? `<input type="checkbox" class="request-checkbox" data-id="${request.id}"/>`
-                   : ""
-               }
-             </td>
-             <td>${request.username}</td>
-             <td>${request.treeName}</td>
-             <td>${request.treeType}</td>
-             <td>${request.treeCost}</td>
-             <td data-field="status">${request.plantingStatus}</td>
-             <td class="timestamp">${formattedDate}</td>
-          
-           `;
+      <td class="checkbox-cell">
+        ${
+          isPending
+            ? `<input type="checkbox" class="request-checkbox" data-id="${request.id}"/>`
+            : ""
+        }
+      </td>
+      <td>${request.username || "N/A"}</td>
+      <td>${request.treeName || "N/A"}</td>
+      <td>${request.treeType || "N/A"}</td>
+      <td>${request.treeCost || "N/A"}</td>
+      <td class="status-cell" data-field="status">
+          ${request.plantingStatus || "N/A"}
+      </td>
+      <td class="timestamp">${formattedDate}</td>
+      <td>
+        ${
+          isPending || isApproved
+            ? `<button class="edit-button" data-id="${request.id}">
+                  <i class="fas fa-edit"></i> Edit
+                </button>`
+            : ""
+        }
+      </td>
+    `;
           tableBody.appendChild(row);
         });
 
-        // Add event listeners
+        // Setup event listeners after adding rows
         setupEventListeners();
       }
 
       // Setup event listeners for checkboxes and buttons
       function setupEventListeners() {
-        // Single update buttons
-        const updateButtons = document.querySelectorAll(".update-button");
-        updateButtons.forEach((button) => {
-          button.addEventListener("click", (event) => {
-            selectedRequests.clear();
-            const requestId = event.target.getAttribute("data-id");
-            openUpdateModal([requestId]);
+        // Edit buttons - Fixed implementation
+        const editButtons = document.querySelectorAll(".edit-button");
+        editButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            event.stopPropagation(); // Prevent event bubbling
+            const requestId = this.getAttribute("data-id");
+            openEditModal(requestId);
           });
         });
 
@@ -720,6 +800,59 @@
         }
       }
 
+      async function openEditModal(requestId) {
+        const modal = document.getElementById("update-modal");
+        if (!modal) {
+          console.error("Modal element not found");
+          return;
+        }
+
+        try {
+          // Get the request's current details
+          const requestRef = doc(db, "plant_requests", requestId);
+          const requestDoc = await getDoc(requestRef);
+
+          if (!requestDoc.exists()) {
+            throw new Error("Request not found");
+          }
+
+          const requestData = requestDoc.data();
+
+          // Display the modal
+          modal.style.display = "block";
+
+          // Update modal content
+          document.getElementById("selected-count").textContent =
+            "Editing Request";
+          document.getElementById("status").value =
+            requestData.plantingStatus || "pending";
+
+          // Initialize map with existing coordinates or default
+          if (requestData.locationLat && requestData.locationLong) {
+            initMap(
+              parseFloat(requestData.locationLat),
+              parseFloat(requestData.locationLong),
+              {
+                lat: parseFloat(requestData.locationLat),
+                lng: parseFloat(requestData.locationLong),
+              }
+            );
+          } else {
+            initMap();
+          }
+
+          // Set up form submission
+          const form = document.getElementById("update-form");
+          form.onsubmit = (e) => {
+            e.preventDefault();
+            updatePlantRequest(requestId);
+          };
+        } catch (error) {
+          console.error("Error opening edit modal:", error);
+          alert(`Error opening edit modal: ${error.message}`);
+        }
+      }
+
       // Update the onMapClick function to handle marker updates
       function onMapClick(e) {
         const lat = e.latlng.lat.toFixed(6);
@@ -737,7 +870,6 @@
         }
       }
 
-      // Modified updatePlantRequests function to reset UI elements
       async function updatePlantRequests(requestIds) {
         const status = document.getElementById("status").value;
         const lat = document.getElementById("lat").value;
@@ -756,63 +888,24 @@
               plantingStatus: status,
               locationLat: lat,
               locationLong: long,
+              timestamp: new Date(), // Update timestamp to maintain proper ordering
             });
           });
 
           await Promise.all(updatePromises);
 
-          // Update UI for each updated request
-          requestIds.forEach((requestId) => {
-            const tableRow = document
-              .querySelector(`button[data-id="${requestId}"]`)
-              .closest("tr");
-            if (tableRow) {
-              const statusCell = tableRow.querySelector(
-                '[data-field="status"]'
-              );
-              if (statusCell) {
-                statusCell.textContent = status;
-              }
-
-              // Handle checkbox cell
-              const checkboxCell = tableRow.querySelector(".checkbox-cell");
-              if (checkboxCell) {
-                if (status === "pending") {
-                  // Add checkbox if status is pending
-                  if (!checkboxCell.querySelector(".request-checkbox")) {
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.className = "request-checkbox";
-                    checkbox.setAttribute("data-id", requestId);
-                    checkbox.addEventListener("change", handleCheckboxChange);
-                    checkboxCell.appendChild(checkbox);
-                  }
-                } else {
-                  // Remove checkbox if status is not pending
-                  const checkbox =
-                    checkboxCell.querySelector(".request-checkbox");
-                  if (checkbox) {
-                    checkbox.remove();
-                  }
-                }
-              }
-            }
-          });
-
-          // Reset select all checkbox
-          const selectAllCheckbox = document.getElementById("select-all");
-          if (selectAllCheckbox) {
-            selectAllCheckbox.checked = false;
-          }
-
-          // Clear selected requests and update controls
+          // Reset UI state
           selectedRequests.clear();
           updateBatchControls();
-
-          alert("Plant requests updated successfully");
           closeModal();
 
-          // Refresh the page data to ensure consistency
+          // Show success message
+          alert("Plant requests updated successfully");
+
+          // Reset pagination state and fetch fresh data
+          currentPage = 1;
+          lastVisible = null;
+          firstVisible = null;
           await fetchPlantRequests();
         } catch (error) {
           console.error("Error updating plant requests: ", error);
@@ -830,10 +923,6 @@
         }
       }
 
-      // Update the modal close button event listener
-      document.querySelector(".close").onclick = closeModal;
-
-      // Modified updatePlantRequest function for single updates
       async function updatePlantRequest(requestId) {
         const status = document.getElementById("status").value;
         const lat = document.getElementById("lat").value;
@@ -852,50 +941,22 @@
             locationLong: long,
           });
 
-          // Update the table row directly
-          const tableRow = document
-            .querySelector(`button[data-id="${requestId}"]`)
-            .closest("tr");
-          if (tableRow) {
-            const statusCell = tableRow.querySelector('[data-field="status"]');
-            if (statusCell) {
-              statusCell.textContent = status;
-            }
-
-            // Handle checkbox cell
-            const checkboxCell = tableRow.querySelector(".checkbox-cell");
-            if (checkboxCell) {
-              if (status === "pending") {
-                // Add checkbox if status is pending
-                if (!checkboxCell.querySelector(".request-checkbox")) {
-                  const checkbox = document.createElement("input");
-                  checkbox.type = "checkbox";
-                  checkbox.className = "request-checkbox";
-                  checkbox.setAttribute("data-id", requestId);
-                  checkbox.addEventListener("change", handleCheckboxChange);
-                  checkboxCell.appendChild(checkbox);
-                }
-              } else {
-                // Remove checkbox if status is not pending
-                const checkbox =
-                  checkboxCell.querySelector(".request-checkbox");
-                if (checkbox) {
-                  checkbox.remove();
-                }
-              }
-            }
-          }
-
-          alert("Plant request updated successfully");
           closeModal();
+          alert("Plant request updated successfully");
 
-          // Refresh the page data to ensure consistency
+          // Reset pagination state and fetch fresh data
+          currentPage = 1;
+          lastVisible = null;
+          firstVisible = null;
           await fetchPlantRequests();
         } catch (error) {
           console.error("Error updating plant request: ", error);
           alert("Failed to update plant request");
         }
       }
+
+      // Update the modal close button event listener
+      document.querySelector(".close").onclick = closeModal;
     </script>
   </body>
 </html>

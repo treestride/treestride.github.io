@@ -90,11 +90,6 @@
         padding: 1rem;
       }
 
-      img {
-        width: 100%;
-        height: auto;
-      }
-
       h1,
       h2,
       h3,
@@ -337,12 +332,36 @@
         display: grid;
         gap: 0.4rem;
       }
+
+      header {
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        justify-content: end;
+        align-items: center;
+        display: flex;
+        gap: 0.4rem;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
+    <header>
+      <h3 style="color: #38a169">Admin</h3>
+      <button class="sign-out-button" id="sign-out">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </header>
     <main>
       <section class="two-column">
         <section class="navigation">
+          <img
+            src="denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="120px"
+            width="120px"
+            style="margin: auto"
+          />
           <h1
             style="
               font-size: 2rem;
@@ -351,13 +370,12 @@
               font-weight: bold;
             "
           >
-            Admin Dashboard
+            TreeStride
           </h1>
           <button id="addTree"><i class="fa-solid fa-plus"></i></button>
-          <button class="sign-out-button" id="sign-out">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-          </button>
-          <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+          <a href="main.html"
+            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+          >
           <a href="announcements.html"
             ><i class="fas fa-bullhorn"></i> Announcements</a
           >
@@ -365,13 +383,13 @@
             ><i class="fas fa-tasks"></i> Manage Mission</a
           >
           <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees</a
+            ><i class="fas fa-tree"></i> Manage Trees (App)</a
           >
           <a href="planting_requests.html"
             ><i class="fas fa-seedling"></i> Planting Requests</a
           >
-          <a href="tree_requests.html"
-            ><i class="fas fa-hand-paper"></i> Tree Requests</a
+          <a href="tree_inventory.html"
+            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
           <a href="reported_posts.html"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
@@ -379,16 +397,18 @@
         </section>
 
         <section class="tree-list">
-          <h1>Tree List</h1>
+          <h1 style="text-align: left; font-size: 2rem; margin-bottom: 1.4rem">
+            Tree List (App)
+          </h1>
           <table id="treeTable" class="tree-table">
             <thead>
               <tr>
                 <th>Tree Name</th>
                 <th>Image</th>
                 <th>Description</th>
-                <th>Cost</th>
+                <th>Points Cost</th>
                 <th>Type</th>
-                <th>Available Trees</th>
+                <th>Alloted Trees</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -453,7 +473,7 @@
             </div>
 
             <div>
-              <label for="availableTrees">Available Trees:</label>
+              <label for="availableTrees">Alloted Trees:</label>
               <input
                 type="number"
                 id="availableTrees"
