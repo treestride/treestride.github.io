@@ -201,69 +201,51 @@
 
       header {
         padding: 1rem;
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        justify-content: end;
+        grid-template-columns: 1fr auto;
+        justify-content: space-between;
         align-items: center;
-        display: flex;
+        display: grid;
         gap: 0.4rem;
         width: 100%;
+      }
+
+      header h1{
+        margin-left: 270px;
+      }
+      
+      .user{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
       }
     </style>
   </head>
   <body>
     <header>
-      <h3 style="color: #38a169">Admin</h3>
-      <button class="sign-out-button" id="sign-out">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
+      <div>
+        <h1>Reported Posts</h1>
+      </div>
+      <div class="user">
+        <h3 style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
     </header>
     <main>
       <section class="two-column">
         <section class="navigation">
-          <img
-            src="denr_logo.png"
-            alt="DENR Dagupan Logo"
-            height="120px"
-            width="120px"
-            style="margin: auto"
-          />
-          <h1
-            style="
-              font-size: 2rem;
-              text-align: center;
-              margin-bottom: 1rem;
-              font-weight: bold;
-            "
-          >
-            TreeStride
-          </h1>
-          <a href="main.html"
-            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
-          >
-          <a href="manage_mission.html"
-            ><i class="fas fa-tasks"></i> Manage Mission</a
-          >
-          <a href="announcements.html"
-            ><i class="fas fa-bullhorn"></i> Announcements</a
-          >
-          <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees (App)</a
-          >
-          <a href="planting_requests.html"
-            ><i class="fas fa-seedling"></i> Planting Requests</a
-          >
-          <a href="tree_inventory.html"
-            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
-          >
-          <a href="reported_posts.html"
-            ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
-          >
+          <img src="denr_logo.png" alt="DENR Dagupan Logo" height="120px" width="120px" style="margin: auto"/>
+            <h1 style="font-size: 2rem; text-align: center; margin-bottom: 1rem; font-weight: bold;">TreeStride</h1>
+            <a href="main.html"><i class="fas fa-users-gear"></i> Users (TreeStride)</a>
+            <a href="manage_mission.html"><i class="fas fa-tasks"></i> Manage Mission</a>
+            <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="planting_requests.html"><i class="fas fa-seedling"></i> Planting Requests</a>
+            <a href="tree_inventory.html"><i class="fas fa-hand-paper"></i> Tree Inventory</a>
+            <a href="stock_management.html"><i class="fas fa-boxes"></i> Stock Management</a>
+            <a href="reported_posts.html"><i class="fas fa-exclamation-triangle"></i> Reported Posts</a>
         </section>
 
-        <h1 style="text-align: left; font-size: 2rem; margin-bottom: 1.4rem">
-          Reported Posts
-        </h1>
         <div class="table-container">
           <table id="posts-table">
             <thead>
@@ -301,6 +283,11 @@
     <script type="module">
       // Import Firebase modules
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
       import {
         getFirestore,
         collection,
@@ -582,6 +569,18 @@
 
       window.handleNextPage = loadNextPage;
       window.handlePrevPage = loadPrevPage;
+
+      // Sign out function
+      const signOutButton = document.getElementById("sign-out");
+      signOutButton.addEventListener("click", () => {
+        signOut(auth)
+          .then(() => {
+            window.location.href = "index.html";
+          })
+          .catch((error) => {
+            console.error("Error signing out: ", error);
+          });
+      });
 
       // Load posts when page loads
       document.addEventListener("DOMContentLoaded", loadReportedPosts);

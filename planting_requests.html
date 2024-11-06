@@ -270,22 +270,68 @@
 
       header {
         padding: 1rem;
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        justify-content: end;
+        grid-template-columns: 1fr auto;
+        justify-content: space-between;
         align-items: center;
-        display: flex;
+        display: grid;
         gap: 0.4rem;
         width: 100%;
+      }
+
+      header h1 {
+        margin-left: 270px;
+      }
+
+      .user {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      /* Add these styles to your existing CSS */
+      .date-filter-controls {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: center;
+      }
+
+      .date-input {
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-input,
+      .form-textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        margin-top: 0.25rem;
+      }
+
+      .form-textarea {
+        min-height: 100px;
+        resize: vertical;
       }
     </style>
   </head>
   <body>
     <header>
-      <h3 style="color: #38a169">Admin</h3>
-      <button class="sign-out-button" id="sign-out">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
+      <div>
+        <h1>Planting Request</h1>
+      </div>
+      <div class="user">
+        <h3 style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
     </header>
     <main>
       <section class="two-column">
@@ -316,35 +362,26 @@
           <a href="announcements.html"
             ><i class="fas fa-bullhorn"></i> Announcements</a
           >
-          <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees (App)</a
-          >
           <a href="planting_requests.html"
             ><i class="fas fa-seedling"></i> Planting Requests</a
           >
           <a href="tree_inventory.html"
             ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
+          <a href="stock_management.html"
+            ><i class="fas fa-boxes"></i> Stock Management</a
+          >
           <a href="reported_posts.html"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
           >
         </section>
 
-        <h1 style="text-align: left; font-size: 2rem; margin-bottom: 1.4rem">
-          Planting Requests
-        </h1>
         <div class="plant-requests-container">
-          <div class="batch-controls">
-            <div class="select-all-container">
-              <input type="checkbox" id="select-all" />
-              <label for="select-all">Select All Pending</label>
-            </div>
-            <button
-              id="batch-update-button"
-              class="action-button"
-              style="margin-left: 1rem"
-            >
-              Update Selected Requests
+          <div class="date-filter-controls">
+            <input type="date" id="start-date" class="date-input" />
+            <input type="date" id="end-date" class="date-input" />
+            <button id="filter-date-btn" class="action-button">
+              Select Pending Requests
             </button>
           </div>
           <table id="plant-requests-table">
@@ -354,10 +391,8 @@
                 <th>Username</th>
                 <th>Tree Name</th>
                 <th>Tree Type</th>
-                <th>Tree Cost</th>
                 <th>Status</th>
                 <th>Requested At</th>
-                <th>Action</th>
               </tr>
             </thead>
             <tbody id="plant-requests-body"></tbody>
@@ -375,24 +410,54 @@
     <div id="update-modal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>Update Plant Request(s)</h2>
+        <h2>Update Plant Request(s) & Create Announcement</h2>
         <form id="update-form">
-          <label for="status">Status:</label>
-          <select id="status" name="status">
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <br /><br />
+          <div class="form-group">
+            <label for="announcement-title">Announcement Title:</label>
+            <input
+              type="text"
+              id="announcement-title"
+              name="title"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="announcement-content">Announcement Content:</label>
+            <textarea
+              id="announcement-content"
+              name="content"
+              required
+              class="form-textarea"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
           <div id="map"></div>
-          <label for="lat">Latitude:</label>
-          <input type="text" id="lat" name="lat" readonly />
-          <br /><br />
-          <label for="long">Longitude:</label>
-          <input type="text" id="long" name="long" readonly />
-          <br /><br />
+
+          <div class="form-group">
+            <label for="lat">Latitude:</label>
+            <input type="number" id="lat" name="lat" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="long">Longitude:</label>
+            <input type="number" id="long" name="long" readonly />
+          </div>
+
           <p id="selected-count"></p>
-          <button type="submit" class="action-button">Update</button>
+          <button type="submit" class="action-button">
+            Create Announcement
+          </button>
         </form>
       </div>
     </div>
@@ -422,6 +487,8 @@
         endBefore,
         limitToLast,
         getDoc,
+        addDoc,
+        Timestamp,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       // Firebase configuration
@@ -468,7 +535,6 @@
       let currentPlantRequest;
       let selectedRequests = new Set();
 
-      // Modified initMap function with clearer location priority
       function initMap(lat = null, lng = null, existingMarker = null) {
         if (map) {
           map.remove();
@@ -485,12 +551,22 @@
 
         if (existingMarker) {
           // Case 1: Use existing marker location
-          map.setView([existingMarker.lat, existingMarker.lng], 13);
-          marker = L.marker([existingMarker.lat, existingMarker.lng]).addTo(
-            map
-          );
-          updateCoordinateInputs(existingMarker.lat, existingMarker.lng);
-        } else if (lat && lng) {
+          if (
+            typeof existingMarker.lat === "number" &&
+            typeof existingMarker.lng === "number"
+          ) {
+            map.setView([existingMarker.lat, existingMarker.lng], 13);
+            marker = L.marker([existingMarker.lat, existingMarker.lng]).addTo(
+              map
+            );
+            updateCoordinateInputs(existingMarker.lat, existingMarker.lng);
+          } else {
+            console.error(
+              "Invalid latitude or longitude values in existingMarker:",
+              existingMarker
+            );
+          }
+        } else if (typeof lat === "number" && typeof lng === "number") {
           // Case 2: Use provided coordinates
           map.setView([lat, lng], 13);
           marker = L.marker([lat, lng]).addTo(map);
@@ -520,8 +596,8 @@
 
       // Helper function to update coordinate inputs (unchanged)
       function updateCoordinateInputs(lat, lng) {
-        document.getElementById("lat").value = lat.toFixed(6);
-        document.getElementById("long").value = lng.toFixed(6);
+        document.getElementById("lat").value = lat;
+        document.getElementById("long").value = lng;
       }
 
       async function fetchPlantRequests(direction = "next") {
@@ -620,18 +696,10 @@
     `;
           tableBody.appendChild(emptyRow);
 
-          if (batchControls) {
-            batchControls.style.display = "none";
-          }
           return;
         }
 
-        if (batchControls) {
-          batchControls.style.display = "flex";
-        }
-
         selectedRequests.clear();
-        updateBatchControls();
 
         plantRequests.forEach((request) => {
           if (!request) return;
@@ -655,96 +723,13 @@
       <td>${request.username || "N/A"}</td>
       <td>${request.treeName || "N/A"}</td>
       <td>${request.treeType || "N/A"}</td>
-      <td>${request.treeCost || "N/A"}</td>
       <td class="status-cell" data-field="status">
           ${request.plantingStatus || "N/A"}
       </td>
       <td class="timestamp">${formattedDate}</td>
-      <td>
-        ${
-          isPending || isApproved
-            ? `<button class="edit-button" data-id="${request.id}">
-                  <i class="fas fa-edit"></i> Edit
-                </button>`
-            : ""
-        }
-      </td>
     `;
           tableBody.appendChild(row);
         });
-
-        // Setup event listeners after adding rows
-        setupEventListeners();
-      }
-
-      // Setup event listeners for checkboxes and buttons
-      function setupEventListeners() {
-        // Edit buttons - Fixed implementation
-        const editButtons = document.querySelectorAll(".edit-button");
-        editButtons.forEach((button) => {
-          button.addEventListener("click", function (event) {
-            event.stopPropagation(); // Prevent event bubbling
-            const requestId = this.getAttribute("data-id");
-            openEditModal(requestId);
-          });
-        });
-
-        // Checkbox change events
-        const checkboxes = document.querySelectorAll(".request-checkbox");
-        checkboxes.forEach((checkbox) => {
-          checkbox.addEventListener("change", handleCheckboxChange);
-        });
-
-        // Select all checkbox
-        const selectAllCheckbox = document.getElementById("select-all");
-        selectAllCheckbox.addEventListener("change", handleSelectAll);
-
-        // Batch update button
-        const batchUpdateButton = document.getElementById(
-          "batch-update-button"
-        );
-        batchUpdateButton.addEventListener("click", () => {
-          if (selectedRequests.size > 0) {
-            openUpdateModal(Array.from(selectedRequests));
-          }
-        });
-      }
-
-      // Handle individual checkbox changes
-      function handleCheckboxChange(event) {
-        const requestId = event.target.getAttribute("data-id");
-        if (event.target.checked) {
-          selectedRequests.add(requestId);
-        } else {
-          selectedRequests.delete(requestId);
-        }
-        updateBatchControls();
-      }
-
-      // Handle select all checkbox
-      function handleSelectAll(event) {
-        const checkboxes = document.querySelectorAll(".request-checkbox");
-        checkboxes.forEach((checkbox) => {
-          checkbox.checked = event.target.checked;
-          const requestId = checkbox.getAttribute("data-id");
-          if (event.target.checked) {
-            selectedRequests.add(requestId);
-          } else {
-            selectedRequests.delete(requestId);
-          }
-        });
-        updateBatchControls();
-      }
-
-      // Update batch controls visibility
-      function updateBatchControls() {
-        const batchUpdateButton = document.getElementById(
-          "batch-update-button"
-        );
-        batchUpdateButton.classList.toggle(
-          "visible",
-          selectedRequests.size > 0
-        );
       }
 
       // Add pagination event listeners
@@ -757,6 +742,68 @@
         currentPage++;
         fetchPlantRequests("next");
       });
+
+      function initializeDateFilter() {
+        const startDateInput = document.getElementById("start-date");
+        const endDateInput = document.getElementById("end-date");
+        const filterButton = document.getElementById("filter-date-btn");
+
+        // Set default end date to today
+        const today = new Date();
+        endDateInput.value = today.toISOString().split("T")[0];
+
+        // Set default start date to 7 days ago
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        startDateInput.value = sevenDaysAgo.toISOString().split("T")[0];
+
+        filterButton.addEventListener("click", selectRequestsByDateRange);
+      }
+
+      async function selectRequestsByDateRange() {
+        const startDate = new Date(document.getElementById("start-date").value);
+        const endDate = new Date(document.getElementById("end-date").value);
+        endDate.setHours(23, 59, 59, 999); // Include the entire end date
+
+        if (startDate > endDate) {
+          alert("Start date must be before end date");
+          return;
+        }
+
+        // Clear existing selections
+        selectedRequests.clear();
+
+        // Get all checkboxes
+        const checkboxes = document.querySelectorAll(".request-checkbox");
+
+        checkboxes.forEach((checkbox) => {
+          const row = checkbox.closest("tr");
+          const timestampCell = row.querySelector(".timestamp");
+          const statusCell = row.querySelector(".status-cell");
+
+          if (timestampCell && statusCell) {
+            const requestDate = new Date(timestampCell.textContent);
+            const status = statusCell.textContent.trim();
+
+            if (
+              status === "pending" &&
+              requestDate >= startDate &&
+              requestDate <= endDate
+            ) {
+              checkbox.checked = true;
+              selectedRequests.add(checkbox.getAttribute("data-id"));
+            } else {
+              checkbox.checked = false;
+            }
+          }
+        });
+
+        if (selectedRequests.size > 0) {
+          openUpdateModal(Array.from(selectedRequests));
+        } else {
+          alert("No pending requests found in the selected date range");
+        }
+      }
 
       // Modified openUpdateModal function to handle coordinates
       async function openUpdateModal(requestIds) {
@@ -774,16 +821,12 @@
           const requestData = requestDoc.data();
 
           // Initialize map based on existing coordinates or device location
-          if (requestData.locationLat && requestData.locationLong) {
+          if (requestData.latitude && requestData.longitude) {
             // Use saved coordinates
-            initMap(
-              parseFloat(requestData.locationLat),
-              parseFloat(requestData.locationLong),
-              {
-                lat: parseFloat(requestData.locationLat),
-                lng: parseFloat(requestData.locationLong),
-              }
-            );
+            initMap(requestData.latitude, requestData.longitude, {
+              lat: requestData.latitude,
+              lng: requestData.longitude,
+            });
           } else {
             // No saved coordinates, initialize with device location
             initMap();
@@ -828,15 +871,11 @@
             requestData.plantingStatus || "pending";
 
           // Initialize map with existing coordinates or default
-          if (requestData.locationLat && requestData.locationLong) {
-            initMap(
-              parseFloat(requestData.locationLat),
-              parseFloat(requestData.locationLong),
-              {
-                lat: parseFloat(requestData.locationLat),
-                lng: parseFloat(requestData.locationLong),
-              }
-            );
+          if (requestData.latitude && requestData.longitude) {
+            initMap(requestData.latitude, requestData.longitude, {
+              lat: requestData.latitude,
+              lng: requestData.longitude,
+            });
           } else {
             initMap();
           }
@@ -855,8 +894,8 @@
 
       // Update the onMapClick function to handle marker updates
       function onMapClick(e) {
-        const lat = e.latlng.lat.toFixed(6);
-        const lng = e.latlng.lng.toFixed(6);
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
 
         // Update input fields
         document.getElementById("lat").value = lat;
@@ -874,33 +913,54 @@
         const status = document.getElementById("status").value;
         const lat = document.getElementById("lat").value;
         const long = document.getElementById("long").value;
+        const announcementTitle =
+          document.getElementById("announcement-title").value;
+        const announcementContent = document.getElementById(
+          "announcement-content"
+        ).value;
 
         if (!lat || !long) {
           alert("Please select a location on the map before updating.");
           return;
         }
 
+        if (!announcementTitle || !announcementContent) {
+          alert("Please fill in both the announcement title and content.");
+          return;
+        }
+
         try {
-          // Update each selected request
+          // First, update all selected plant requests
           const updatePromises = requestIds.map((requestId) => {
             const requestRef = doc(db, "plant_requests", requestId);
             return updateDoc(requestRef, {
               plantingStatus: status,
-              locationLat: lat,
-              locationLong: long,
-              timestamp: new Date(), // Update timestamp to maintain proper ordering
+              timestamp: new Date(),
             });
           });
 
           await Promise.all(updatePromises);
 
+          // Then, create the announcement
+          const announcementRef = collection(db, "announcements");
+          await addDoc(announcementRef, {
+            title: announcementTitle,
+            content: announcementContent,
+            imageUrl: "",
+            location: {
+              lat: lat,
+              long: long,
+            },
+            latitude: lat,
+            longitude: long,
+            timestamp: Timestamp.now(),
+          });
+
           // Reset UI state
           selectedRequests.clear();
-          updateBatchControls();
           closeModal();
 
-          // Show success message
-          alert("Plant requests updated successfully");
+          alert("Plant requests updated and announcement created successfully");
 
           // Reset pagination state and fetch fresh data
           currentPage = 1;
@@ -908,10 +968,17 @@
           firstVisible = null;
           await fetchPlantRequests();
         } catch (error) {
-          console.error("Error updating plant requests: ", error);
-          alert("Failed to update plant requests");
+          console.error(
+            "Error updating plant requests and creating announcement: ",
+            error
+          );
+          alert("Failed to update plant requests and create announcement");
         }
       }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeDateFilter();
+      });
 
       // Clean up when closing the modal
       function closeModal() {
@@ -937,8 +1004,6 @@
           const requestRef = doc(db, "plant_requests", requestId);
           await updateDoc(requestRef, {
             plantingStatus: status,
-            locationLat: lat,
-            locationLong: long,
           });
 
           closeModal();
@@ -954,6 +1019,18 @@
           alert("Failed to update plant request");
         }
       }
+
+      // Sign out function
+      const signOutButton = document.getElementById("sign-out");
+      signOutButton.addEventListener("click", () => {
+        signOut(auth)
+          .then(() => {
+            window.location.href = "index.html";
+          })
+          .catch((error) => {
+            console.error("Error signing out: ", error);
+          });
+      });
 
       // Update the modal close button event listener
       document.querySelector(".close").onclick = closeModal;

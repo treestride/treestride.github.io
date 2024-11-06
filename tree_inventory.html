@@ -281,70 +281,52 @@
 
       header {
         padding: 1rem;
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        justify-content: end;
+        grid-template-columns: 1fr auto;
+        justify-content: space-between;
         align-items: center;
-        display: flex;
+        display: grid;
         gap: 0.4rem;
         width: 100%;
+      }
+
+      header h1{
+        margin-left: 270px;
+      }
+      
+      .user{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
       }
     </style>
   </head>
   <body>
     <header>
-      <h3 style="color: #38a169">Admin</h3>
-      <button class="sign-out-button" id="sign-out">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
+      <div>
+        <h1>Tree Inventory</h1>
+      </div>
+      <div class="user">
+        <h3 style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
     </header>
     <main>
       <section class="navigation">
-        <img
-          src="denr_logo.png"
-          alt="DENR Dagupan Logo"
-          height="120px"
-          width="120px"
-          style="margin: auto"
-        />
-        <h1
-          style="
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            font-weight: bold;
-          "
-        >
-          TreeStride
-        </h1>
         <button id="addTree"><i class="fa-solid fa-plus"></i></button>
-        <a href="main.html"
-          ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
-        >
-        <a href="manage_mission.html"
-          ><i class="fas fa-tasks"></i> Manage Mission</a
-        >
-        <a href="announcements.html"
-          ><i class="fas fa-bullhorn"></i> Announcements</a
-        >
-        <a href="manage_trees.html"
-          ><i class="fas fa-tree"></i> Manage Trees (App)</a
-        >
-        <a href="planting_requests.html"
-          ><i class="fas fa-seedling"></i> Planting Requests</a
-        >
-        <a href="tree_inventory.html"
-          ><i class="fas fa-hand-paper"></i> Tree Inventory</a
-        >
-        <a href="reported_posts.html"
-          ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
-        >
+        <img src="denr_logo.png" alt="DENR Dagupan Logo" height="120px" width="120px" style="margin: auto"/>
+        <h1 style="font-size: 2rem; text-align: center; margin-bottom: 1rem; font-weight: bold;">TreeStride</h1>
+        <a href="main.html"><i class="fas fa-users-gear"></i> Users (TreeStride)</a>
+        <a href="manage_mission.html"><i class="fas fa-tasks"></i> Manage Mission</a>
+        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+        <a href="planting_requests.html"><i class="fas fa-seedling"></i> Planting Requests</a>
+        <a href="tree_inventory.html"><i class="fas fa-hand-paper"></i> Tree Inventory</a>
+        <a href="stock_management.html"><i class="fas fa-boxes"></i> Stock Management</a>
+        <a href="reported_posts.html"><i class="fas fa-exclamation-triangle"></i> Reported Posts</a>
       </section>
 
       <section class="content">
-        <div class="header-section">
-          <h1 style="text-align: left; font-size: 2rem">Tree Inventory</h1>
-        </div>
 
         <div class="stats">
           <div class="stat-card">
@@ -408,9 +390,6 @@
             <option value="bearing">Bearing</option>
             <option value="non-bearing">Non-bearing</option>
           </select>
-
-          <label for="stocks">Stocks:</label>
-          <input type="number" id="stocks" required />
 
           <label for="treeImage">Tree Image:</label>
           <input type="file" id="treeImage" accept="image/*" />
@@ -506,83 +485,93 @@
       }
 
       // Load and display trees
-      async function loadTrees() {
-        try {
-          const querySnapshot = await getDocs(treesCollectionRef);
-          const treeItems = document.getElementById("treeItems");
-          treeItems.innerHTML = "";
+      // In your existing tree_inventory.html file, update the loadTrees function:
 
-          // Reset statistics
-          let totalTrees = 0;
-          let bearingTrees = 0;
-          let nonBearingTrees = 0;
+async function loadTrees() {
+    try {
+        const querySnapshot = await getDocs(treesCollectionRef);
+        const treeItems = document.getElementById("treeItems");
+        treeItems.innerHTML = "";
 
-          // Get filter values
-          const searchTerm = document
-            .getElementById("searchInput")
-            .value.toLowerCase();
-          const typeFilter = document.getElementById("typeFilter").value;
+        // Reset statistics
+        let totalTrees = 0;
+        let bearingTrees = 0;
+        let nonBearingTrees = 0;
 
-          querySnapshot.forEach((doc) => {
+        // Get filter values
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const typeFilter = document.getElementById("typeFilter").value;
+
+        // Get all stock entries
+        const stockEntriesSnapshot = await getDocs(collection(db, "stock_entries"));
+        const stocksByTree = {};
+        
+        // Calculate total stocks for each tree
+        stockEntriesSnapshot.forEach((doc) => {
+            const entry = doc.data();
+            stocksByTree[entry.treeId] = (stocksByTree[entry.treeId] || 0) + entry.quantity;
+        });
+
+        querySnapshot.forEach((doc) => {
             const tree = { id: doc.id, ...doc.data() };
+            
+            // Update tree's total stock with the sum from stock entries
+            tree.stocks = stocksByTree[doc.id] || 0;
 
             // Apply filters
             if (
-              (searchTerm &&
+                (searchTerm &&
                 !tree.name.toLowerCase().includes(searchTerm) &&
                 !tree.description.toLowerCase().includes(searchTerm)) ||
-              (typeFilter && tree.type !== typeFilter)
+                (typeFilter && tree.type !== typeFilter)
             ) {
-              return;
+                return;
             }
 
             // Update statistics
             totalTrees++;
             if (tree.type === "bearing") {
-              bearingTrees++;
+                bearingTrees++;
             } else {
-              nonBearingTrees++;
+                nonBearingTrees++;
             }
 
             const row = document.createElement("tr");
             const lastUpdated = tree.lastUpdated
-              ? new Date(tree.lastUpdated.toDate()).toLocaleDateString()
-              : "Never";
+                ? new Date(tree.lastUpdated.toDate()).toLocaleDateString()
+                : "Never";
 
             row.innerHTML = `
-              <td><img src="${tree.image || "/placeholder-tree.jpg"}" alt="${
-              tree.name
-            }"></td>
-              <td>${tree.name}</td>
-              <td>${tree.description}</td>
-              <td>${tree.type === "bearing" ? "Bearing" : "Non-bearing"}</td>
-              <td>${tree.stocks}</td>
-              <td>${lastUpdated}</td>
-              <td class="actions">
-                <button onclick="window.editTree('${doc.id}')">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="delete-btn" onclick="window.confirmDelete('${
-                  doc.id
-                }')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
+                <td><img src="${tree.image || "/placeholder-tree.jpg"}" alt="${tree.name}"></td>
+                <td>${tree.name}</td>
+                <td>${tree.description}</td>
+                <td>${tree.type === "bearing" ? "Bearing" : "Non-bearing"}</td>
+                <td>${tree.stocks}</td>
+                <td>${lastUpdated}</td>
+                <td class="actions">
+                    <button onclick="window.editTree('${doc.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-btn" onclick="window.confirmDelete('${doc.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             `;
 
             treeItems.appendChild(row);
-          });
+        });
 
-          // Update statistics display
-          document.getElementById("totalTrees").textContent = totalTrees;
-          document.getElementById("bearingTrees").textContent = bearingTrees;
-          document.getElementById("nonBearingTrees").textContent =
-            nonBearingTrees;
-        } catch (error) {
-          console.error("Error loading trees:", error);
-          alert("Error loading tree inventory!");
-        }
-      }
+        // Update statistics display
+        // Update statistics display
+        document.getElementById("totalTrees").textContent = totalTrees;
+        document.getElementById("bearingTrees").textContent = bearingTrees;
+        document.getElementById("nonBearingTrees").textContent = nonBearingTrees;
+
+    } catch (error) {
+        console.error("Error loading trees:", error);
+        alert("Error loading tree inventory!");
+    }
+}
 
       // Add/Update tree
       async function saveTree(event) {
@@ -593,7 +582,6 @@
           name: document.getElementById("name").value,
           description: document.getElementById("description").value,
           type: document.getElementById("type").value,
-          stocks: document.getElementById("stocks").value,
           lastUpdated: serverTimestamp(),
         };
 
@@ -654,7 +642,6 @@
             document.getElementById("name").value = data.name;
             document.getElementById("description").value = data.description;
             document.getElementById("type").value = data.type;
-            document.getElementById("stocks").value = data.stocks;
 
             modal.style.display = "flex";
           }
@@ -680,6 +667,18 @@
       document
         .getElementById("typeFilter")
         .addEventListener("change", loadTrees);
+
+        // Sign out function
+      const signOutButton = document.getElementById("sign-out");
+      signOutButton.addEventListener("click", () => {
+        signOut(auth)
+          .then(() => {
+            window.location.href = "index.html";
+          })
+          .catch((error) => {
+            console.error("Error signing out: ", error);
+          });
+      });
 
       // Initial load
       loadTrees();

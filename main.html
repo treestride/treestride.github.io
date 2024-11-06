@@ -59,7 +59,6 @@
         height: 100vh;
         width: 250px;
         background: var(--bg-secondary);
-        border-right: 1px solid var(--border-color);
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
@@ -91,13 +90,14 @@
       }
 
       .users-stats {
+        display: flex;
+        justify-items: center;
+        justify-content: end;
         background: var(--bg-secondary);
-        padding: 2rem;
         border-radius: 0.4rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1.2rem;
+        margin-bottom: 1.4rem;
         color: var(--text-primary);
-        font-size: 2rem;
+        font-size: 1.4rem;
         font-weight: 600;
       }
 
@@ -137,8 +137,35 @@
 
       /* Modal Styles */
       .modal {
-        background: rgba(0, 0, 0, 0.5);
+        top: 50%;
+        left: 50%;
+        position: fixed;
+        align-items: center;
+        text-align: left;
+        background-color: rgba(0, 0, 0, 0.1);
+        transform: translate(-50%, -50%);
         backdrop-filter: blur(4px);
+        width: 100%;
+        height: 100%;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        justify-content: space-between;
+        text-align: center;
+        width: 100%;
+      }
+
+      .qr-code img {
+        width: 250px;
+        height: 250px;
+      }
+
+      #edit-modal .modal-content {
+        overflow-y: scroll;
+        height: 60%;
+        width: 50%;
       }
 
       .modal-content {
@@ -146,8 +173,8 @@
         border-radius: 0.4rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         padding: 2rem;
-        max-width: 500px;
-        width: 90%;
+        margin: auto;
+        width: 50%;
       }
 
       .modal-content h2 {
@@ -217,11 +244,15 @@
       }
 
       /* User Details Styles */
+      #user-details {
+        display: flex;
+        text-align: center;
+        flex-direction: column;
+      }
+
       #user-details img {
         width: 100px;
         height: 100px;
-        border-radius: 50%;
-        margin: 0 auto;
         display: block;
         object-fit: cover;
       }
@@ -330,6 +361,7 @@
         cursor: pointer;
         transition: background-color 0.2s ease;
       }
+
       .empty-state {
         display: none;
         text-align: center;
@@ -359,22 +391,36 @@
 
       header {
         padding: 1rem;
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        justify-content: end;
+        grid-template-columns: 1fr auto;
+        justify-content: space-between;
         align-items: center;
-        display: flex;
+        display: grid;
         gap: 0.4rem;
         width: 100%;
+      }
+
+      header h1 {
+        margin-left: 270px;
+      }
+
+      .user {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
       }
     </style>
   </head>
   <body>
     <header>
-      <h3 style="color: #38a169">Admin</h3>
-      <button class="sign-out-button" id="sign-out">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
+      <div>
+        <h1>TreeStride Users</h1>
+      </div>
+      <div class="user">
+        <h3 style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
     </header>
     <main>
       <section class="two-column">
@@ -396,24 +442,23 @@
           >
             TreeStride
           </h1>
-
           <a href="main.html"
             ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
-          >
-          <a href="announcements.html"
-            ><i class="fas fa-bullhorn"></i> Announcements</a
           >
           <a href="manage_mission.html"
             ><i class="fas fa-tasks"></i> Manage Mission</a
           >
-          <a href="manage_trees.html"
-            ><i class="fas fa-tree"></i> Manage Trees (App)</a
+          <a href="announcements.html"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
+          <a href="planting_requests.html"
+            ><i class="fas fa-seedling"></i> Planting Requests</a
           >
           <a href="tree_inventory.html"
             ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
-          <a href="planting_requests.html"
-            ><i class="fas fa-seedling"></i> Planting Requests</a
+          <a href="stock_management.html"
+            ><i class="fas fa-boxes"></i> Stock Management</a
           >
           <a href="reported_posts.html"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
@@ -421,15 +466,16 @@
         </section>
 
         <section class="user-list">
-          <div class="users-stats">
-            Total Users: <span id="total-users-count">0</span>
-          </div>
           <div class="users-table-container">
             <!-- Add this empty state div before the table -->
             <div id="empty-state" class="empty-state">
               <i class="fas fa-users-slash"></i>
               <h3>No Users Found</h3>
               <p>There are currently no users registered in the system.</p>
+            </div>
+            <div class="users-stats">
+              TreeStride Users:
+              <span id="total-users-count" style="margin-left: 0.4rem">0</span>
             </div>
             <table id="user-table">
               <thead>
@@ -458,23 +504,31 @@
       <div id="user-modal" class="modal" style="display: none">
         <div class="modal-content">
           <span class="close">&times;</span>
-          <h2>User Details</h2>
-          <div id="user-details">
-            <p style="display: grid; margin: auto">
-              <strong>Profile:</strong>
-              <br />
-              <img src="" id="modal-profile" />
-            </p>
-            <p><strong>Username:</strong> <span id="modal-username"></span></p>
-            <p><strong>Email:</strong> <span id="modal-email"></span></p>
-            <p><strong>Phone Number:</strong> <span id="modal-phone"></span></p>
-            <p style="display: grid; margin: auto">
-              <strong>QR Code:</strong>
-              <br />
-              <a id="qr-link" href="" target="_blank">
-                <img id="modal-qr" src="" alt="User QR Code" />
-              </a>
-            </p>
+          <h2 style="text-align: center">User Details</h2>
+          <div class="two-col">
+            <div id="user-details">
+              <p style="display: grid; margin: auto">
+                <strong>Profile:</strong>
+                <br />
+                <img src="" id="modal-profile" />
+              </p>
+              <p>
+                <strong>Username:</strong> <span id="modal-username"></span>
+              </p>
+              <p><strong>Email:</strong> <span id="modal-email"></span></p>
+              <p>
+                <strong>Phone Number:</strong> <span id="modal-phone"></span>
+              </p>
+            </div>
+            <div class="qr-code">
+              <p style="display: grid; margin: auto">
+                <strong>QR Code:</strong>
+                <br />
+                <a id="qr-link" href="" target="_blank">
+                  <img id="modal-qr" src="" alt="User QR Code" />
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -626,24 +680,15 @@
         usersToDisplay.forEach((userData, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td><img src="${userData.photoURL}" alt="${
-            userData.username
-          }'s photo" /></td>
+            <td><img src="${userData.photoURL}" alt="${userData.username}'s photo" /></td>
             <td>${userData.username}</td>
             <td>${userData.totalPoints}</td>
             <td>${userData.totalSteps}</td>
             <td>${userData.totalTrees}</td>
             <td>${userData.missionsCompleted}</td>
             <td class="actions">
-              <button class="action-button view-button" data-uid="${
-                userData.uid
-              }">View</button>
-              <button class="action-button edit-button" data-uid="${
-                userData.uid
-              }">Edit</button>
-              <button class="action-button delete-button" data-uid="${
-                userData.uid
-              }" data-index="${startIndex + index}">Delete</button>
+              <button class="action-button view-button" data-uid="${userData.uid}">View</button>
+              <button class="action-button edit-button" data-uid="${userData.uid}">Edit</button>
             </td>
           `;
           userList.appendChild(row);
@@ -700,7 +745,7 @@
               userData.missionsCompleted;
 
             // Show the edit modal
-            document.getElementById("edit-modal").style.display = "flex";
+            document.getElementById("edit-modal").style.display = "grid";
           }
         } catch (error) {
           console.error("Error fetching user for edit: ", error);
@@ -760,7 +805,7 @@
             document.getElementById("qr-link").href = userData.userQrCode || "";
 
             // Show the modal
-            document.getElementById("user-modal").style.display = "flex";
+            document.getElementById("user-modal").style.display = "grid";
           } else {
             alert("User not found");
           }
@@ -794,72 +839,6 @@
           editModal.style.display = "none";
         }
       };
-
-      // Attach event listeners to the delete buttons
-      const deleteButtons = document.querySelectorAll(".delete-button");
-
-      deleteButtons.forEach((button) => {
-        button.addEventListener("click", async (event) => {
-          const uid = event.target.getAttribute("data-uid");
-          const index = event.target.getAttribute("data-index");
-          await deleteUser(uid, index);
-        });
-      });
-
-      async function deleteUser(uid, index) {
-        if (
-          confirm(
-            "Are you sure you want to delete this user? This will delete all their data."
-          )
-        ) {
-          try {
-            // Delete user document
-            const userRef = doc(db, "users", uid);
-            await deleteDoc(userRef);
-
-            // Delete related data from other collections
-            // Delete user's missions
-            const missionsQuery = query(
-              collection(db, "missions"),
-              where("userId", "==", uid)
-            );
-            const missionsSnapshot = await getDocs(missionsQuery);
-            const deleteMissions = missionsSnapshot.docs.map((doc) =>
-              deleteDoc(doc.ref)
-            );
-
-            // Delete user's tree records
-            const treesQuery = query(
-              collection(db, "trees"),
-              where("userId", "==", uid)
-            );
-            const treesSnapshot = await getDocs(treesQuery);
-            const deleteTrees = treesSnapshot.docs.map((doc) =>
-              deleteDoc(doc.ref)
-            );
-
-            // Wait for all deletions to complete
-            await Promise.all([...deleteMissions, ...deleteTrees]);
-
-            // Update users array and total count
-            users.splice(index, 1);
-            totalUsers = users.length;
-
-            // Update the total users count display
-            document.getElementById("total-users-count").textContent =
-              totalUsers;
-
-            // Update the display and pagination
-            displayUsers(currentPage);
-            updatePaginationControls();
-
-            alert("User and related data deleted successfully.");
-          } catch (error) {
-            console.error("Error deleting user: ", error);
-            alert("Failed to delete user and related data.");
-          }
-        }
-      }
 
       // Update the pagination controls
       function updatePaginationControls() {
