@@ -1,381 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TreeStride - Stock Management</title>
-    <style>
-        @import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
-        * {
-            box-sizing: border-box;
-            font-family: "Exo 2", "Roboto";
-            font-optical-sizing: auto;
-            font-display: swap;
-            font-style: normal;
-            padding: 0;
-            margin: 0;
-        }
-
-        :root {
-            --primary-color: #38a169;
-            --primary-hover: #2f855a;
-            --danger-color: #e53e3e;
-            --warning-color: #d69e2e;
-            --text-primary: #2d3748;
-            --text-secondary: #4a5568;
-            --bg-primary: #f7fafc;
-            --bg-secondary: #fff;
-            --border-color: #e2e8f0;
-        }
-
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-
-        .navigation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 250px;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .navigation a {
-            padding: 0.75rem 1rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .navigation a:hover {
-            background: var(--bg-primary);
-            color: var(--primary-color);
-        }
-
-        .navigation a i {
-            margin-right: 0.4rem;
-        }
-
-        .sign-out-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-        color: var(--text-primary);
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .sign-out-button:hover {
-        background: #edf2f7;
-      }
-
-        main {
-            margin-left: 250px;
-            padding: 2rem;
-        }
-
-        .stock-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-        }
-
-        .stock-history {
-            margin-top: 2rem;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .stock-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        .stock-table th,
-        .stock-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .stock-table th {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        header {
-        padding: 1rem;
-        grid-template-columns: 1fr auto;
-        justify-content: space-between;
-        align-items: center;
-        display: grid;
-        gap: 0.4rem;
-        width: 100%;
-      }
-
-      header h1{
-        margin-left: 270px;
-      }
-      
-      .user{
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-      }
-    </style>
-</head>
-<body>
+    <link rel="stylesheet" href="stock_management.css" />
+  </head>
+  <body>
     <header>
-        <div>
-          <h1>Stock Management</h1>
-        </div>
-        <div class="user">
-          <h3 style="color: #38a169">Admin</h3>
-          <button class="sign-out-button" id="sign-out">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-          </button>
-        </div>
-      </header>
+      <div>
+        <h1>Stock Management</h1>
+      </div>
+      <div class="user">
+        <h3 style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
 
     <main>
-        <section class="navigation">
-            <img src="denr_logo.png" alt="DENR Dagupan Logo" height="120px" width="120px" style="margin: auto"/>
-            <h1 style="font-size: 2rem; text-align: center; margin-bottom: 1rem; font-weight: bold;">TreeStride</h1>
-            <a href="main.html"><i class="fas fa-users-gear"></i> Users (TreeStride)</a>
-            <a href="manage_mission.html"><i class="fas fa-tasks"></i> Manage Mission</a>
-            <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
-            <a href="planting_requests.html"><i class="fas fa-seedling"></i> Planting Requests</a>
-            <a href="tree_inventory.html"><i class="fas fa-hand-paper"></i> Tree Inventory</a>
-            <a href="stock_management.html"><i class="fas fa-boxes"></i> Stock Management</a>
-            <a href="reported_posts.html"><i class="fas fa-exclamation-triangle"></i> Reported Posts</a>
-        </section>
+      <section class="navigation">
+        <img
+          src="denr_logo.png"
+          alt="DENR Dagupan Logo"
+          height="120px"
+          width="120px"
+          style="margin: auto"
+        />
+        <h1
+          style="
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: bold;
+          "
+        >
+          TreeStride
+        </h1>
+        <a href="main.html"
+          ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+        >
+        <a href="manage_mission.html"
+          ><i class="fas fa-tasks"></i> Manage Mission</a
+        >
+        <a href="announcements.html"
+          ><i class="fas fa-bullhorn"></i> Announcements</a
+        >
+        <a href="planting_requests.html"
+          ><i class="fas fa-seedling"></i> Planting Requests</a
+        >
+        <a href="tree_inventory.html"
+          ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+        >
+        <a href="manage_trees.html"
+          ><i class="fas fa-tree"></i> Manage Trees (App)</a
+        >
+        <a href="stock_management.html"
+          ><i class="fas fa-boxes"></i> Stock Management</a
+        >
+        <a href="reported_posts.html"
+          ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+        >
+      </section>
 
-        <div class="stock-form">
-            <form id="stockForm">
-                <div class="form-group">
-                    <label for="treeSelect">Select Tree:</label>
-                    <select id="treeSelect" required></select>
-                </div>
-                <div class="form-group">
-                    <label for="stockQuantity">Stock Quantity:</label>
-                    <input type="number" id="stockQuantity" required min="1">
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notes:</label>
-                    <input type="text" id="notes" placeholder="Optional notes about this stock entry">
-                </div>
-                <button type="submit">Add Stock Entry</button>
-            </form>
-        </div>
+      <div class="stock-form">
+        <form id="stockForm">
+          <div class="form-group">
+            <label for="treeSelect">Select Tree:</label>
+            <select id="treeSelect" required></select>
+          </div>
 
-        <div class="stock-history">
-            <h2>Stock History</h2>
-            <table class="stock-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Tree Name</th>
-                        <th>Quantity</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody id="stockHistory"></tbody>
-            </table>
-        </div>
+          <!-- This section will be hidden until a tree is selected -->
+          <div id="stockFields" style="display: none">
+            <div class="form-group">
+              <label for="currentStock">Current Stock:</label>
+              <input type="text" id="currentStock" readonly />
+            </div>
+            <div class="form-group">
+              <label for="operation">Operation:</label>
+              <select id="operation" required>
+                <option value="add">Add</option>
+                <option value="deduct">Deduct</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="stockQuantity">Stock Quantity:</label>
+              <input type="number" id="stockQuantity" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="notes">Notes:</label>
+              <input
+                type="text"
+                id="notes"
+                placeholder="Optional notes about this stock entry"
+              />
+            </div>
+            <button type="submit">Add Stock Entry</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="stock-history">
+        <h2>Stock History</h2>
+        <table class="stock-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Tree Name</th>
+              <th>Quantity</th>
+              <th>Notes</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="stockHistory"></tbody>
+        </table>
+      </div>
     </main>
 
-    <script src="https://kit.fontawesome.com/ec19991922.js" crossorigin="anonymous"></script>
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDocs,
-            query,
-            orderBy,
-            serverTimestamp,
-            doc,
-            updateDoc,
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import {
-            getAuth,
-            onAuthStateChanged,
-            signOut,
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        query,
+        orderBy,
+        serverTimestamp,
+        doc,
+        updateDoc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
-            authDomain: "treestride-project.firebaseapp.com",
-            projectId: "treestride-project",
-            storageBucket: "treestride-project.appspot.com",
-            messagingSenderId: "218404996569",
-            appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
-            measurementId: "G-XR01C3LFWD",
-        };
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
+        authDomain: "treestride-project.firebaseapp.com",
+        projectId: "treestride-project",
+        storageBucket: "treestride-project.appspot.com",
+        messagingSenderId: "218404996569",
+        appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
+        measurementId: "G-XR01C3LFWD",
+      };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
 
-        // Authentication check
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                if (user.email !== "admin@gmail.com") {
-                    window.location.href = "index.html";
-                }
-            } else {
-                window.location.href = "index.html";
-            }
-        });
-
-        // Sign out functionality
-        document.getElementById("sign-out").addEventListener("click", () => {
-            signOut(auth).then(() => {
-                window.location.href = "index.html";
-            });
-        });
-
-        // Load trees into select dropdown
-        async function loadTrees() {
-            const treeSelect = document.getElementById("treeSelect");
-            const querySnapshot = await getDocs(collection(db, "tree_inventory"));
-            
-            treeSelect.innerHTML = '<option value="">Select a tree</option>';
-            querySnapshot.forEach((doc) => {
-                const tree = doc.data();
-                const option = document.createElement("option");
-                option.value = doc.id;
-                option.textContent = tree.name;
-                treeSelect.appendChild(option);
-            });
+      // Authentication check
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          if (user.email !== "admin@gmail.com") {
+            window.location.href = "index.html";
+          }
+        } else {
+          window.location.href = "index.html";
         }
+      });
 
-        // Handle form submission
-        document.getElementById("stockForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            
-            const treeId = document.getElementById("treeSelect").value;
-            const quantity = parseInt(document.getElementById("stockQuantity").value);
-            const notes = document.getElementById("notes").value;
+      // Sign out functionality
+      document.getElementById("sign-out").addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "index.html";
+        });
+      });
 
-            try {
-                // Add stock entry
-                await addDoc(collection(db, "stock_entries"), {
-                    treeId,
-                    quantity,
-                    notes,
-                    timestamp: serverTimestamp()
-                });
+      // Load trees into select dropdown
+      async function loadTrees() {
+        const treeSelect = document.getElementById("treeSelect");
+        const querySnapshot = await getDocs(collection(db, "tree_inventory"));
 
-                // Update total stock in tree_inventory
-                const treeRef = doc(db, "tree_inventory", treeId);
-                const treeDoc = await getDoc(treeRef);
-                const currentStock = treeDoc.data().stocks || 0;
-                
-                await updateDoc(treeRef, {
-                    stocks: parseInt(currentStock) + quantity,
-                    lastUpdated: serverTimestamp()
-                });
-
-                alert("Stock entry added successfully!");
-                document.getElementById("stockForm").reset();
-                loadStockHistory();
-            } catch (error) {
-                console.error("Error adding stock entry:", error);
-                alert("Error adding stock entry!");
-            }
+        treeSelect.innerHTML = '<option value="">Select a tree</option>';
+        querySnapshot.forEach((doc) => {
+          const tree = doc.data();
+          const option = document.createElement("option");
+          option.value = doc.id;
+          option.textContent = tree.name;
+          treeSelect.appendChild(option);
         });
 
-        // Load stock history
-        async function loadStockHistory() {
-    const stockHistory = document.getElementById("stockHistory");
-    const querySnapshot = await getDocs(
-        query(collection(db, "stock_entries"), orderBy("timestamp", "desc"))
-    );
+        // Listen for tree selection to display current stock
+        treeSelect.addEventListener("change", updateCurrentStockDisplay);
+      }
 
-    stockHistory.innerHTML = "";
-    
-    for (const stockDoc of querySnapshot.docs) {  // Changed 'doc' to 'stockDoc'
-        const entry = stockDoc.data();
-        const treeDocRef = doc(db, "tree_inventory", entry.treeId);
-        const treeDoc = await getDoc(treeDocRef);
-        const treeName = treeDoc.data()?.name || "Unknown Tree";
-        
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${entry.timestamp ? new Date(entry.timestamp.toDate()).toLocaleString() : "N/A"}</td>
+      // Fetch and display the selected tree's current stock
+      // Show or hide stock fields based on tree selection
+      async function updateCurrentStockDisplay() {
+        const treeId = document.getElementById("treeSelect").value;
+        const currentStockDisplay = document.getElementById("currentStock");
+        const stockFields = document.getElementById("stockFields");
+
+        if (treeId) {
+          // Fetch the current stock for the selected tree
+          const treeDoc = await getDoc(doc(db, "tree_inventory", treeId));
+          const currentStock = treeDoc.exists()
+            ? treeDoc.data().stocks || 0
+            : 0;
+          currentStockDisplay.value = currentStock;
+          stockFields.style.display = "block"; // Show stock fields
+        } else {
+          currentStockDisplay.value = "";
+          stockFields.style.display = "none"; // Hide stock fields
+        }
+      }
+
+      // Handle form submission
+      document
+        .getElementById("stockForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const treeId = document.getElementById("treeSelect").value;
+          const quantity = parseInt(
+            document.getElementById("stockQuantity").value
+          );
+          const notes = document.getElementById("notes").value;
+          const operation = document.getElementById("operation").value;
+          const currentStock = parseInt(
+            document.getElementById("currentStock").value
+          );
+
+          try {
+            // Calculate new stock level and prevent negative stock
+            const newStock =
+              operation === "deduct"
+                ? currentStock - quantity
+                : currentStock + quantity;
+
+            if (newStock < 0) {
+              alert("Not enough stock to deduct the specified quantity.");
+              return;
+            }
+
+            // Add stock entry
+            await addDoc(collection(db, "stock_entries"), {
+              treeId,
+              quantity: operation === "deduct" ? -quantity : quantity,
+              notes,
+              timestamp: serverTimestamp(),
+            });
+
+            // Update total stock in tree_inventory
+            const treeRef = doc(db, "tree_inventory", treeId);
+            await updateDoc(treeRef, {
+              stocks: newStock,
+              lastUpdated: serverTimestamp(),
+            });
+
+            alert(
+              `${
+                operation === "add" ? "Added" : "Deducted"
+              } stock successfully!`
+            );
+            document.getElementById("stockForm").reset();
+            loadStockHistory();
+            updateCurrentStockDisplay(); // Update the current stock display
+          } catch (error) {
+            console.error("Error updating stock:", error);
+            alert("Error updating stock!");
+          }
+        });
+
+      // Load stock history
+      async function loadStockHistory() {
+        const stockHistory = document.getElementById("stockHistory");
+        const querySnapshot = await getDocs(
+          query(collection(db, "stock_entries"), orderBy("timestamp", "desc"))
+        );
+
+        stockHistory.innerHTML = "";
+
+        for (const stockDoc of querySnapshot.docs) {
+          // Changed 'doc' to 'stockDoc'
+          const entry = stockDoc.data();
+          const treeDocRef = doc(db, "tree_inventory", entry.treeId);
+          const treeDoc = await getDoc(treeDocRef);
+          const treeName = treeDoc.data()?.name || "Unknown Tree";
+          const treeImage = treeDoc.data()?.image || "Unknown Image";
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td><img src="${treeImage}" alt="${treeName}" /></td>
             <td>${treeName}</td>
             <td>${entry.quantity}</td>
             <td>${entry.notes || ""}</td>
+            <td>${
+              entry.timestamp
+                ? new Date(entry.timestamp.toDate()).toLocaleString()
+                : "N/A"
+            }</td>
         `;
-        stockHistory.appendChild(row);
-    }
-}
+          stockHistory.appendChild(row);
+        }
+      }
 
-// Sign out function
-const signOutButton = document.getElementById("sign-out");
+      // Sign out function
+      const signOutButton = document.getElementById("sign-out");
       signOutButton.addEventListener("click", () => {
         signOut(auth)
           .then(() => {
@@ -386,9 +315,9 @@ const signOutButton = document.getElementById("sign-out");
           });
       });
 
-        // Initial load
-        loadTrees();
-        loadStockHistory();
+      // Initial load
+      loadTrees();
+      loadStockHistory();
     </script>
-</body>
+  </body>
 </html>
