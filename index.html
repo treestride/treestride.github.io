@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Login</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
+      * {
+        box-sizing: border-box;
+        font-family: "Exo 2", "Roboto";
+        font-optical-sizing: auto;
+        font-display: swap;
+        font-style: normal;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        font-family: Georgia, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: #fafafa;
+        flex: 1;
+      }
+      form {
+        display: grid;
+        width: 100%;
+      }
+      .login-container {
+        display: grid;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 480px;
+        margin: 1em;
+      }
+      .login-container h2 {
+        font-size: 2rem;
+        text-align: center;
+        color: #333;
+      }
+      .login-container label {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+        color: #555;
+      }
+      input[type="email"],
+      input[type="password"],
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+      input[type="email"]:focus,
+      input[type="password"]:focus,
+      input[type="text"]:focus {
+        border-color: #4caf50;
+      }
+      .login-container button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .login-container button:hover {
+        background-color: #4caf50;
+      }
+      .login-container .error-message {
+        color: red;
+        display: block;
+        text-align: center;
+        margin-top: 10px;
+      }
+      .password-toggle {
+        display: flex;
+        margin-bottom: 1rem;
+        align-items: center;
+        column-gap: 1rem;
+      }
+      .logo {
+        display: grid;
+        margin-bottom: 1rem;
+        grid-template-columns: auto auto;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo">
+        <h2>Admin Login</h2>
+        <img
+          src="denr_logo.png"
+          alt="DENR Dagupan Logo"
+          height="64px"
+          width="64px"
+          style="margin: auto"
+        />
+      </div>
+      <form id="login-form">
+        <label for="email">Email:</label>
+        <input class="text-input" type="email" id="email" required />
+
+        <label for="password">Password:</label>
+        <input class="text-input" type="password" id="password" required />
+
+        <!-- Checkbox for show/hide password -->
+        <div class="password-toggle">
+          <div>
+            <input
+              type="checkbox"
+              id="show-password"
+              onclick="togglePassword()"
+            />
+          </div>
+          <div>
+            <label for="show-password">Show Password</label>
+          </div>
+        </div>
+
+        <button type="submit">Login</button>
+        <div class="error-message" id="error-message"></div>
+      </form>
+    </div>
+
+    <!-- Firebase App (modular) -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
+        authDomain: "treestride-project.firebaseapp.com",
+        projectId: "treestride-project",
+        storageBucket: "treestride-project.appspot.com",
+        messagingSenderId: "218404996569",
+        appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
+        measurementId: "G-XR01C3LFWD",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const errorMessage = document.getElementById("error-message");
+
+          try {
+            const userCredential = await signInWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+            const user = userCredential.user;
+
+            if (email !== "") {
+              window.location.href = "views/dashboard.html";
+            } else {
+              errorMessage.textContent = "Unauthorized email";
+            }
+          } catch (error) {
+            errorMessage.textContent = error.message;
+          }
+        });
+
+      // Toggle password visibility based on checkbox
+      window.togglePassword = function () {
+        const passwordField = document.getElementById("password");
+        const showPasswordCheckbox = document.getElementById("show-password");
+
+        passwordField.type = showPasswordCheckbox.checked ? "text" : "password";
+      };
+    </script>
+  </body>
+</html>
