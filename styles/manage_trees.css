@@ -1,0 +1,356 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
+* {
+  box-sizing: border-box;
+  font-family: "Exo 2", "Roboto";
+  font-optical-sizing: auto;
+  font-display: swap;
+  font-style: normal;
+  padding: 0;
+  margin: 0;
+}
+
+:root {
+  --primary-color: #38a169;
+  --primary-hover: #2f855a;
+  --danger-color: #e53e3e;
+  --warning-color: #d69e2e;
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --bg-primary: #f7fafc;
+  --bg-secondary: #fff;
+  --border-color: #e2e8f0;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.sign-out-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sign-out-button:hover {
+  background: #edf2f7;
+}
+
+/* Navigation Styles */
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  overflow-y: scroll;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.navigation a {
+  padding: 0.4rem 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.navigation a:hover {
+  background: var(--bg-primary);
+  color: var(--primary-color);
+}
+
+.navigation a i {
+  margin-right: 0.4rem;
+}
+
+.navigation div{
+  display: grid;
+  gap: 0.8rem;
+}
+
+/* Main Content Styles */
+main {
+  margin-left: 250px;
+  padding: 1rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+strong {
+  color: #444;
+}
+
+form {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+label {
+  margin-bottom: 5px;
+  color: #444;
+}
+
+select,
+input,
+textarea,
+.modal button {
+  width: 100%;
+  padding: 12px;
+  color: #444;
+  font-size: 1em;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.modal button {
+  cursor: pointer;
+  background-color: #3a9249;
+  color: white;
+  border: none;
+  padding: 6px;
+  font-size: 1.1em;
+  border-radius: 8px;
+  transition: all 0.3s ease-in;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 480px;
+  overflow-y: scroll;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+.tree-list {
+  width: 100%;
+  max-width: 100%;
+}
+
+.tree-list h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.tree-item {
+  display: grid;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  align-content: space-between;
+  border-bottom: 1px solid #ddd;
+}
+
+.tree-item .image {
+  max-width: 100%;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  height: 200px;
+  overflow: hidden;
+}
+
+.tree-item img {
+  object-fit: fill;
+}
+
+.tree-item button {
+  background-color: #3a9249;
+}
+
+.three-column {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.three-column div {
+  display: grid;
+  gap: 0.4rem;
+  flex: 50%;
+}
+
+.three-column-btn {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  margin-top: 0.6rem;
+  padding: 0 0.6rem 0.6rem 0.6rem;
+}
+
+.three-column-btn div {
+  padding: 0.4rem;
+}
+
+.tree {
+  display: flex;
+  margin-top: 0.6rem;
+}
+
+.description {
+  margin-top: 0.6rem;
+}
+
+.description p {
+  height: 72px;
+  max-height: 72px;
+  overflow-y: scroll;
+}
+
+#currentImageLabel {
+  font-size: 12px;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-table {
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.tree-table th,
+.tree-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  color: #444;
+}
+
+.tree-table th {
+  background-color: #3a9249;
+  color: white;
+  font-weight: bold;
+}
+
+.tree-table tbody tr:hover {
+  background-color: #f4f7fa;
+}
+
+.tree-table img {
+  width: 50px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.tree-table button {
+  background-color: #3a9249;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tree-table td {
+  vertical-align: middle;
+}
+
+.actions {
+  display: grid;
+  gap: 1rem;
+}
+
+.actions .delete {
+  background-color: #f44336;
+}
+
+.two-column-modal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.two-column-modal div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+header{
+    padding: 1rem;
+    grid-template-columns: 1fr auto;
+    justify-content: space-between;
+    align-items: center;
+    display: grid;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+header h1{
+margin-left: 270px;
+}
+
+.user{
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.tree-list div{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tree-list div button{
+  font-size: 1rem;
+  background: #3a9249;
+  padding: 0.4rem 1.4rem;
+  border-radius: 0.4rem;
+  color: white;
+  border: none;
+}
+
+.tree-list div button i{
+  margin-right: 0.4rem;
+  font-size: 0.8rem;
+}
