@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Dashboard</title>
+    <link rel="stylesheet" href="../styles/dashboard.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+
+        <section class="reports-section">
+          <div class="period-selector">
+            <label for="timePeriod">View Data By:</label>
+            <select id="timePeriod" class="time-period-select">
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+
+          <div class="stats-cards">
+            <div class="stat-card">
+              <i class="fas fa-tree"></i>
+              <h3>Total Trees Planted</h3>
+              <p id="total-trees">0</p>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-leaf"></i>
+              <h3>Total Tree Species</h3>
+              <p id="total-species">0</p>
+            </div>
+          </div>
+
+          <div class="charts-container">
+            <div class="chart-card">
+              <h3>Trees Planted Over Time</h3>
+              <div class="chart-wrapper">
+                <canvas id="trees-chart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Tree Species Distribution</h3>
+              <div class="chart-wrapper">
+                <canvas id="species-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../scripts/dashboard.js"></script>
+  </body>
+</html>

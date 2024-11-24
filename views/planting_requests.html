@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Planting Requests</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="../styles/planting_request.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Planting Request</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+
+        <div class="plant-requests-container">
+          <h1 style="margin-bottom: 1rem">Set Filter</h1>
+          <div class="date-filter-controls">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" class="date-input" />
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" class="date-input" />
+            <label for="tree-name-filter">Tree Name:</label>
+            <select id="tree-name-filter" class="filter-input">
+              <option value="">All Trees</option>
+            </select>
+            <button id="filter-date-btn" class="filter-button">
+              Select Pending Requests
+            </button>
+          </div>
+          <table id="plant-requests-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"></th>
+                <th>Username</th>
+                <th>Tree Name</th>
+                <th>Tree Type</th>
+                <th>Status</th>
+                <th>Requested At</th>
+              </tr>
+            </thead>
+            <tbody id="plant-requests-body"></tbody>
+          </table>
+          <div class="pagination">
+            <button id="prev-page" disabled>Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-page">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modified update modal -->
+    <div id="update-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 style="margin-bottom: 1rem">Update & Post as Announcement</h2>
+        <form id="update-form">
+          <div class="form-group">
+            <label for="announcement-title">Announcement Title:</label>
+            <input
+              type="text"
+              id="announcement-title"
+              name="title"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="announcement-content">Announcement Content:</label>
+            <textarea
+              id="announcement-content"
+              name="content"
+              required
+              class="form-textarea"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div id="map"></div>
+
+          <div class="form-group" style="display: none">
+            <label for="lat">Latitude:</label>
+            <input type="number" id="lat" name="lat" readonly />
+          </div>
+
+          <div class="form-group" style="display: none">
+            <label for="long">Longitude:</label>
+            <input type="number" id="long" name="long" readonly />
+          </div>
+
+          <p id="selected-count"></p>
+          <button type="submit" class="action-button">
+            Create Announcement
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/planting_requests.js"></script>
+  </body>
+</html>

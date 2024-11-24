@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Manage Mission</title>
+    <link rel="stylesheet" href="../styles/manage_mission.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Manage Mission</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <button id="updateMission">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+        <section class="mission">
+          <div>
+            <h1 id="displaySteps">No Mission/Initializing</h1>
+            <h3>Required Steps</h3>
+          </div>
+          <div>
+            <h1 id="displayReward">No Mission/Initializing</h1>
+            <h3>Reward</h3>
+          </div>
+          <div>
+            <h1 id="displayEndDate">No Mission/Initializing</h1>
+            <h3>End Date</h3>
+          </div>
+        </section>
+
+        <section class="progress-section">
+          <h1>Users In Progress</h1>
+          <table id="userTable">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Mission Steps</th>
+                <th>Progress</th>
+                <th>Missions Completed</th>
+              </tr>
+            </thead>
+            <tbody id="userProgress">
+              <tr class="no-data">
+                <td colspan="4">Loading user data...</td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="pagination">
+            <button id="prevPage" disabled>Previous</button>
+            <span id="pageDisplay">Page 1</span>
+            <button id="nextPage">Next</button>
+          </div>
+        </section>
+
+        <section class="progress-section completed-section">
+          <h1>Users Completed</h1>
+          <table id="completedTable">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Mission Steps</th>
+                <th>Missions Completed</th>
+              </tr>
+            </thead>
+            <tbody id="completedProgress">
+              <tr class="no-data">
+                <td colspan="3">Loading completed missions...</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+    </main>
+
+    <!-- The Modal -->
+    <div id="missionModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="missionForm">
+          <label for="steps">Steps:</label>
+          <select id="steps" name="steps" aria-label="Select Steps">
+            <option>250</option>
+            <option>30000</option>
+            <option>50000</option>
+            <option>55000</option>
+            <option>60000</option>
+            <option>70000</option>
+          </select>
+          <label for="reward">Reward:</label>
+          <select id="reward" name="reward" aria-label="Select Reward">
+            <option>1000</option>
+            <option>10000</option>
+            <option>20000</option>
+            <option>30000</option>
+            <option>40000</option>
+            <option>50000</option>
+          </select>
+          <label for="endDate">End Date:</label>
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            aria-label="Select End Date"
+            required
+            min=""
+          />
+
+          <button type="button" id="saveMission">SAVE</button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/manage_mission.js"></script>
+  </body>
+</html>

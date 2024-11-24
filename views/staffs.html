@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Staffs</title>
+    <link rel="stylesheet" href="../styles/staffs.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Create Account</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+
+        <section class="account-management">
+          <div class="account-container">
+            <div class="create-account-form">
+              <h2>Create New Account</h2>
+              <form id="create-account-form">
+                <div class="form-group">
+                  <label for="username">Username:</label>
+                  <input type="text" id="username" required />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email:</label>
+                  <input type="email" id="email" required />
+                </div>
+                <div class="form-group">
+                  <label for="password">Password:</label>
+                  <div class="password-input-container">
+                    <input type="password" id="password" required />
+                    <button
+                      type="button"
+                      class="toggle-password"
+                      aria-label="Toggle password visibility"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="password-requirements">
+                    <p>Password must contain:</p>
+                    <ul>
+                      <li id="length-check">
+                        <i class="fas fa-circle"></i> At least 8 characters
+                      </li>
+                      <li id="uppercase-check">
+                        <i class="fas fa-circle"></i> One uppercase letter
+                      </li>
+                      <li id="number-check">
+                        <i class="fas fa-circle"></i> One number
+                      </li>
+                      <li id="special-check">
+                        <i class="fas fa-circle"></i> One special character
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number:</label>
+                  <input type="tel" id="phone" />
+                </div>
+                <div class="form-group">
+                  <label for="role">Role:</label>
+                  <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="sub-admin">Sub-Admin</option>
+                    <option value="forester">Forester</option>
+                  </select>
+                </div>
+                <button type="submit" class="create-button">
+                  Create Account
+                </button>
+              </form>
+            </div>
+
+            <div class="staff-accounts">
+              <h2>Staff Accounts</h2>
+              <div id="empty-state" class="empty-state" style="display: none">
+                <i class="fas fa-users-slash"></i>
+                <h3>No Staff Accounts</h3>
+                <p>There are currently no staff accounts in the system.</p>
+              </div>
+              <table id="staff-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-list"></tbody>
+              </table>
+              <div id="pagination-controls">
+                <button id="prev-page">Previous</button>
+                <span id="page-info"></span>
+                <button id="next-page">Next</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- Edit Staff Modal -->
+      <div id="edit-modal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2>Edit Staff Account</h2>
+          <form id="edit-form">
+            <input type="hidden" id="edit-uid" />
+            <div class="form-group">
+              <label for="edit-username">Username:</label>
+              <input type="text" id="edit-username" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-email">Email:</label>
+              <input type="email" id="edit-email" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-phone">Phone:</label>
+              <input type="tel" id="edit-phone" />
+            </div>
+            <div class="form-group">
+              <label for="edit-role">Role:</label>
+              <select id="edit-role" required>
+                <option value="sub-admin">Sub-Admin</option>
+                <option value="forester">Forester</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-status">Status:</label>
+              <select id="edit-status" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <button type="submit" class="save-button">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/staffs.js"></script>
+  </body>
+</html>

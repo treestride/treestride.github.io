@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Announcements</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="../styles/announcements.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Announcements</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+
+        <div class="container">
+          <button id="create-announcement-btn">Create New Announcement</button>
+
+          <div id="announcements">
+            <h2>Current Announcements</h2>
+            <!-- Announcements will be dynamically added here -->
+          </div>
+          <div class="pagination">
+            <button id="prev-page" disabled>Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-page">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Modal -->
+    <div id="announcement-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modal-title">Create New Announcement</h2>
+        <form id="announcement-form">
+          <label for="title">Title:</label>
+          <input type="text" id="title" required />
+
+          <label for="content">Content:</label>
+          <textarea id="content" rows="4" required></textarea>
+
+          <label for="image" style="margin-bottom: 0.4rem"
+            >Image (optional):</label
+          >
+          <input type="file" id="image" accept="image/*" />
+
+          <label for="location-sharing">
+            <input type="checkbox" id="location-sharing" />
+            Share Location
+          </label>
+
+          <div id="map" style="display: none"></div>
+          <input type="hidden" id="location" />
+
+          <button type="submit" id="submit-announcement">
+            Post Announcement
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/announcements.js"></script>
+  </body>
+</html>

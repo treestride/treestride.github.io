@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Stock Management</title>
+    <link rel="stylesheet" href="../styles/stock_management.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Stock Management</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="navigation">
+        <div>
+          <img
+            src="../denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="120px"
+            width="120px"
+            style="margin: auto"
+          />
+          <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+            TreeStride
+          </h1>
+          <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-home"></i> Dashboard</a
+          >
+          <a
+            href="manage_mission.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tasks"></i> Manage Mission</a
+          >
+          <a
+            href="announcements.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
+          <a
+            href="planting_requests.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-seedling"></i> Planting Requests</a
+          >
+          <a
+            href="tree_inventory.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+          >
+          <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tree"></i> Manage Trees (App)</a
+          >
+          <a
+            href="stock_management.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-boxes"></i> Stock Management</a
+          >
+          <a
+            href="reported_posts.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+          >
+          <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+          >
+          <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-user-plus"></i> Manage Staffs</a
+          >
+        </div>
+      </section>
+
+      <div class="stock-form">
+        <form id="stockForm">
+          <div class="form-group">
+            <label for="treeSelect">Select Tree:</label>
+            <select id="treeSelect" required></select>
+          </div>
+
+          <!-- This section will be hidden until a tree is selected -->
+          <div id="stockFields" style="display: none">
+            <div class="form-group">
+              <label for="currentStock">Current Stock:</label>
+              <input type="text" id="currentStock" readonly />
+            </div>
+            <div class="form-group">
+              <label for="operation">Operation:</label>
+              <select id="operation" required>
+                <option value="delivered">Delivered</option>
+                <option value="requested">Requested</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="stockQuantity">Stock Quantity:</label>
+              <input type="text" id="stockQuantity" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="notes">Notes:</label>
+              <input
+                type="text"
+                id="notes"
+                placeholder="Optional notes about this stock entry"
+              />
+            </div>
+            <button type="submit">Add Stock Entry</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="stock-history">
+        <h2>Stock History</h2>
+        <table class="stock-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Tree Name</th>
+              <th>Operation</th>
+              <th>Quantity</th>
+              <th>Notes</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="stockHistory"></tbody>
+        </table>
+        <div class="pagination-container">
+          <div class="pagination-info">
+            Showing <span id="startIndex">0</span> to
+            <span id="endIndex">0</span> of
+            <span id="totalEntries">0</span> entries
+          </div>
+          <div class="pagination-controls" id="paginationControls"></div>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/stock_management.js"></script>
+  </body>
+</html>

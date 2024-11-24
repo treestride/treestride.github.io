@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Main Page</title>
+    <link rel="stylesheet" href="../styles/users.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>TreeStride Users</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+
+        <section class="user-list">
+          <div class="users-table-container">
+            <!-- Add this empty state div before the table -->
+            <div id="empty-state" class="empty-state">
+              <i class="fas fa-users-slash"></i>
+              <h3>No Users Found</h3>
+              <p>There are currently no users registered in the system.</p>
+            </div>
+            <div class="users-stats">
+              TreeStride Users:
+              <span id="total-users-count" style="margin-left: 0.4rem">0</span>
+            </div>
+            <table id="user-table">
+              <thead>
+                <tr>
+                  <th>Photo</th>
+                  <th>Username</th>
+                  <th>Total Points</th>
+                  <th>Total Steps</th>
+                  <th>Trees Planted</th>
+                  <th>Missions Completed</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="user-list"></tbody>
+            </table>
+            <div id="pagination-controls">
+              <button id="prev-page">Previous</button>
+              <span id="page-info"></span>
+              <button id="next-page">Next</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- User Details Modal -->
+      <div id="user-modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2 style="text-align: center">User Details</h2>
+          <div class="two-col">
+            <div id="user-details">
+              <p style="display: grid; margin: auto">
+                <strong>Profile:</strong>
+                <br />
+                <img src="" id="modal-profile" />
+              </p>
+              <p>
+                <strong>Username:</strong> <span id="modal-username"></span>
+              </p>
+              <p><strong>Email:</strong> <span id="modal-email"></span></p>
+              <p>
+                <strong>Phone Number:</strong> <span id="modal-phone"></span>
+              </p>
+            </div>
+            <div class="qr-code">
+              <p style="display: grid; margin: auto">
+                <strong>QR Code:</strong>
+                <br />
+                <a id="qr-link" href="" target="_blank">
+                  <img id="modal-qr" src="" alt="User QR Code" />
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add new Edit Modal -->
+      <div id="edit-modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <span
+            class="close"
+            onclick="document.getElementById('edit-modal').style.display='none'"
+            >&times;</span
+          >
+          <h2>Edit User Details</h2>
+          <form id="edit-form" class="modal-form">
+            <input type="hidden" id="edit-uid" />
+            <div>
+              <label for="edit-username">Username:</label>
+              <input type="text" id="edit-username" required />
+            </div>
+            <div>
+              <label for="edit-email">Email:</label>
+              <input type="email" id="edit-email" required />
+            </div>
+            <div>
+              <label for="edit-phone">Phone Number:</label>
+              <input type="tel" id="edit-phone" />
+            </div>
+            <div>
+              <label for="edit-points">Total Points:</label>
+              <input type="number" id="edit-points" required />
+            </div>
+            <div>
+              <label for="edit-steps">Total Steps:</label>
+              <input type="number" id="edit-steps" required />
+            </div>
+            <div>
+              <label for="edit-trees">Trees Planted:</label>
+              <input type="number" id="edit-trees" required />
+            </div>
+            <div>
+              <label for="edit-missions">Missions Completed:</label>
+              <input type="number" id="edit-missions" required />
+            </div>
+            <button type="submit" class="save-button">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/users.js"></script>
+  </body>
+</html>

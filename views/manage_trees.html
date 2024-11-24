@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeStride - Manage Trees</title>
+    <link rel="stylesheet" type="text/css" href="../styles/manage_trees.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Tree List (App)</h1>
+      </div>
+      <div class="user">
+        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <button class="sign-out-button" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </header>
+    <main>
+      <section class="two-column">
+        <section class="navigation">
+          <div>
+            <img
+              src="../denr_logo.png"
+              alt="DENR Dagupan Logo"
+              height="120px"
+              width="120px"
+              style="margin: auto"
+            />
+            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+              TreeStride
+            </h1>
+            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-home"></i> Dashboard</a
+            >
+            <a
+              href="manage_mission.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tasks"></i> Manage Mission</a
+            >
+            <a
+              href="announcements.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-bullhorn"></i> Announcements</a
+            >
+            <a
+              href="planting_requests.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-seedling"></i> Planting Requests</a
+            >
+            <a
+              href="tree_inventory.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+            >
+            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-tree"></i> Manage Trees (App)</a
+            >
+            <a
+              href="stock_management.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-boxes"></i> Stock Management</a
+            >
+            <a
+              href="reported_posts.html"
+              style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+            >
+            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+            >
+            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+              ><i class="fas fa-user-plus"></i> Manage Staffs</a
+            >
+          </div>
+        </section>
+
+        <section class="tree-list">
+          <div>
+            <h2 style="margin-bottom: 1rem">Active Trees</h2>
+            <button id="addTreeBtn"><i class="fas fa-plus"></i>Add Tree</button>
+          </div>
+          <table id="treeTable" class="tree-table">
+            <thead>
+              <tr>
+                <th>Tree Name</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Points Cost</th>
+                <th>Type</th>
+                <th>Alloted Trees</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="treeItems"></tbody>
+          </table>
+
+          <h2 style="margin-top: 2rem; margin-bottom: 1rem">Archived Trees</h2>
+          <table id="removedTreeTable" class="tree-table">
+            <thead>
+              <tr>
+                <th>Tree Name</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Archived Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="removedTreeItems"></tbody>
+          </table>
+        </section>
+      </section>
+    </main>
+
+    <div id="addTreeModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="addTreeForm">
+          <h2>Add Tree from Inventory</h2>
+
+          <label for="selectTree">Select Tree:</label>
+          <select id="selectTree" required>
+            <option value="">Select a tree...</option>
+          </select>
+
+          <div id="treeDetails" style="display: none">
+            <div class="form-group">
+              <label>Name:</label>
+              <input type="text" id="treeName" readonly />
+            </div>
+
+            <div class="form-group">
+              <label>Description:</label>
+              <input type="text" id="treeDescription" readonly />
+            </div>
+
+            <div class="form-group">
+              <label>Type:</label>
+              <input type="text" id="treeType" readonly />
+            </div>
+
+            <div class="form-group">
+              <label>Available Stock:</label>
+              <input type="text" id="availableStock" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="treeCost">Points Cost:</label>
+              <input type="text" id="treeCost" required min="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="allocatedTrees">Number of Trees to Allocate:</label>
+              <input type="text" id="allocatedTrees" required min="1" />
+            </div>
+          </div>
+
+          <button type="submit" id="saveTreeAllocation">Save</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Restock Modal -->
+    <div id="restockModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="restockForm">
+          <h2>Restock Tree</h2>
+          <div class="form-group">
+            <label>Tree Name:</label>
+            <input type="text" id="restockTreeName" readonly />
+          </div>
+          <div class="form-group">
+            <label for="restockAmount">Number of Trees to Add:</label>
+            <input type="number" id="restockAmount" required min="1" />
+          </div>
+          <div class="form-group">
+            <label for="restockCost">Update Points Cost:</label>
+            <input type="number" id="restockCost" required min="1" />
+          </div>
+          <button type="submit">Restock Tree</button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://kit.fontawesome.com/ec19991922.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../scripts/manage_trees.js"></script>
+  </body>
+</html>
