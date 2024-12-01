@@ -16,13 +16,12 @@
         margin: 0;
       }
       body {
+        display: grid;
         font-family: Georgia, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
         margin: 0;
         padding: 0;
+        height: 100vh;
+        width: 100%;
         background: #fafafa;
         flex: 1;
       }
@@ -100,44 +99,54 @@
         justify-content: space-between;
         align-items: center;
       }
+      .container {
+        display: grid;
+        align-items: center;
+        justify-items: center;
+        margin: auto;
+        height: 100%;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
-    <div class="login-container">
-      <div class="logo">
-        <h2>Admin Login</h2>
-        <img
-          src="denr_logo.png"
-          alt="DENR Dagupan Logo"
-          height="64px"
-          width="64px"
-          style="margin: auto"
-        />
-      </div>
-      <form id="login-form">
-        <label for="email">Email:</label>
-        <input class="text-input" type="email" id="email" required />
-
-        <label for="password">Password:</label>
-        <input class="text-input" type="password" id="password" required />
-
-        <!-- Checkbox for show/hide password -->
-        <div class="password-toggle">
-          <div>
-            <input
-              type="checkbox"
-              id="show-password"
-              onclick="togglePassword()"
-            />
-          </div>
-          <div>
-            <label for="show-password">Show Password</label>
-          </div>
+    <div class="container">
+      <div class="login-container">
+        <div class="logo">
+          <h2>Admin Login</h2>
+          <img
+            src="denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="64px"
+            width="64px"
+            style="margin: auto"
+          />
         </div>
+        <form id="login-form">
+          <label for="email">Email:</label>
+          <input class="text-input" type="email" id="email" required />
 
-        <button type="submit">Login</button>
-        <div class="error-message" id="error-message"></div>
-      </form>
+          <label for="password">Password:</label>
+          <input class="text-input" type="password" id="password" required />
+
+          <!-- Checkbox for show/hide password -->
+          <div class="password-toggle">
+            <div>
+              <input
+                type="checkbox"
+                id="show-password"
+                onclick="togglePassword()"
+              />
+            </div>
+            <div>
+              <label for="show-password">Show Password</label>
+            </div>
+          </div>
+
+          <button type="submit">Login</button>
+          <div class="error-message" id="error-message"></div>
+        </form>
+      </div>
     </div>
 
     <!-- Firebase App (modular) -->
