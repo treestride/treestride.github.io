@@ -12,7 +12,7 @@
         <h1>Tree Inventory</h1>
       </div>
       <div class="user">
-        <h3 id="user-role-display" style="color: #38a169">Admin</h3>
+        <h3 id="user-role-display" style="color: #38a169"></h3>
         <button class="sign-out-button" id="sign-out">
           <i class="fas fa-sign-out-alt"></i> Sign Out
         </button>
@@ -75,10 +75,6 @@
             <p id="totalTrees">0</p>
           </div>
           <div class="stat-card">
-            <h3>Growing Trees</h3>
-            <p id="growingTrees">0</p>
-          </div>
-          <div class="stat-card">
             <h3>Bearing</h3>
             <p id="bearingTrees">0</p>
           </div>
@@ -90,16 +86,6 @@
 
         <!-- Add tab navigation -->
         <div class="tab-navigation">
-          <button
-            class="tab-button active"
-            onclick="switchTab('seedling', event)"
-          >
-            Seedlings
-          </button>
-          <button class="tab-button" onclick="switchTab('growing', event)">
-            Growing Trees
-          </button>
-
           <button id="addTree">
             <i class="fa-solid fa-plus"></i>
             Add Tree
@@ -135,22 +121,6 @@
           </thead>
           <tbody id="treeItems"></tbody>
         </table>
-
-        <!-- Growing Trees Table -->
-        <table class="tree-table" id="growingTable" style="display: none">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Type</th>
-              <th>Growth Phase</th>
-              <th>Last Updated</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="growingTreeItems"></tbody>
-        </table>
       </section>
     </main>
     <div id="treeModal" class="modal">
@@ -171,15 +141,15 @@
             <option value="non-bearing">Non-bearing</option>
           </select>
 
-          <label for="status">Status:</label>
-          <select id="growthPhase" required>
-            <option value="seed">Seed</option>
-            <option value="sprout">Sprout</option>
-            <option value="seedling">Seedling</option>
-          </select>
-
           <label for="treeImage">Tree Image:</label>
           <input type="file" id="treeImage" accept="image/*" />
+
+          <img
+            id="treeImagePreview"
+            src=""
+            alt="Tree Image"
+            style="display: none; max-width: 100px; margin: auto"
+          />
 
           <button type="button" id="saveTree">Save Tree</button>
         </form>
