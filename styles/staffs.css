@@ -392,7 +392,7 @@ main {
 
   .admin-password-dialog .dialog-buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
     margin-top: 15px;
   }
@@ -430,4 +430,17 @@ main {
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+
+  .dialog-buttons button {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.4rem;
+    background-color: #38a169;
+    border: 1px solid #2f855a;
+    color: white;
+  }
+  
+  .cancel-button{
+    background-color: transparent!important;
+    color: black!important;
   }

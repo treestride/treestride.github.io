@@ -116,7 +116,7 @@ select {
   font-size: 1rem;
 }
 
-button {
+.confirm {
   background: var(--primary-color);
   color: white;
   border: none;
@@ -128,7 +128,7 @@ button {
   width: 100%;
 }
 
-button:hover {
+.confirm:hover {
   background: var(--primary-hover);
 }
 
