@@ -559,6 +559,8 @@ async function updatePlantRequests(requestIds) {
       const requestRef = doc(db, "plant_requests", requestId);
       return updateDoc(requestRef, {
         plantingStatus: status,
+        locationLat: lat.toString(),
+        locationLong: long.toString(),
         timestamp: new Date(),
       });
     });
@@ -622,6 +624,8 @@ async function updatePlantRequest(requestId) {
     const requestRef = doc(db, "plant_requests", requestId);
     await updateDoc(requestRef, {
       plantingStatus: status,
+      locationLat: lat.toString(),
+      locationLong: long.toString(),
     });
 
     closeModal();

@@ -207,37 +207,40 @@ document
     }
   });
 
-async function loadStockHistory() {
-  const querySnapshot = await getDocs(
-    query(collection(db, "stock_entries"), orderBy("timestamp", "desc"))
-  );
-
-  stockEntries = await Promise.all(
-    querySnapshot.docs.map(async (stockDoc) => {
-      const entry = stockDoc.data();
-      const treeDocRef = doc(db, "tree_inventory", entry.treeId);
-      const treeDoc = await getDoc(treeDocRef);
-      const treeName = treeDoc.data()?.name || "Unknown Tree";
-      const treeImage = treeDoc.data()?.image || "placeholder.jpg";
-
-      return {
-        image: treeImage,
-        treeName: treeName,
-        operation:
-          entry.operation ||
-          (entry.quantity > 0 ? "delivered" : "requested"),
-        quantity: Math.abs(entry.quantity),
-        notes: entry.notes || "",
-        timestamp: entry.timestamp
-          ? new Date(entry.timestamp.toDate()).toLocaleString()
-          : "N/A",
-      };
-    })
-  );
-
-  updatePagination();
-  displayCurrentPage();
-}
+  async function loadStockHistory() {
+    const querySnapshot = await getDocs(
+      query(collection(db, "stock_entries"), orderBy("timestamp", "desc"))
+    );
+  
+    stockEntries = await Promise.all(
+      querySnapshot.docs.map(async (stockDoc) => {
+        const entry = stockDoc.data();
+        const treeDocRef = doc(db, "tree_inventory", entry.treeId);
+        const treeDoc = await getDoc(treeDocRef);
+  
+        const treeName = treeDoc.exists() 
+          ? `${treeDoc.data().name || "Unknown Tree"}`
+          : "Unknown Tree";
+  
+        const treeImage = treeDoc.data()?.image || "placeholder.jpg";
+  
+        return {
+          image: treeImage,
+          treeName: treeName,
+          operation: entry.operation || (entry.quantity > 0 ? "delivered" : "requested"),
+          quantity: Math.abs(entry.quantity),
+          notes: entry.notes || "",
+          timestamp: entry.timestamp
+            ? new Date(entry.timestamp.toDate()).toLocaleString()
+            : "N/A",
+        };
+      })
+    );
+  
+    updatePagination();
+    displayCurrentPage();
+  }
+  
 
 function updatePagination() {
   const totalPages = Math.ceil(stockEntries.length / itemsPerPage);

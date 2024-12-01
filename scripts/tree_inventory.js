@@ -4,11 +4,12 @@ import {
   collection,
   addDoc,
   updateDoc,
-  deleteDoc,
   getDocs,
   doc,
   getDoc,
   serverTimestamp,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage,
@@ -37,7 +38,6 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const treesCollectionRef = collection(db, "tree_inventory");
-const growingTreesCollectionRef = collection(db, "growing_trees");
 
 const PAGE_PERMISSIONS = {
   'dashboard.html': ['admin', 'sub-admin', 'forester'],
@@ -123,10 +123,12 @@ const addTreeBtn = document.getElementById("addTree");
 const closeBtn = document.getElementsByClassName("close")[0];
 
 addTreeBtn.onclick = () => (modal.style.display = "flex");
+
 closeBtn.onclick = () => {
   modal.style.display = "none";
   clearForm();
 };
+
 window.onclick = (event) => {
   if (event.target == modal) {
     modal.style.display = "none";
@@ -139,39 +141,10 @@ function clearForm() {
   document.getElementById("treeId").value = "";
 }
 
-// Load and display trees
-let currentTab = "seedling";
-
-// Tab switching function
-window.switchTab = function (tab, event) {
-  // Add event parameter
-  currentTab = tab;
-  document.querySelectorAll(".tab-button").forEach((btn) => {
-    btn.classList.remove("active");
-  });
-  if (event && event.target) {
-    // Check if event exists
-    event.target.classList.add("active");
-  } else {
-    // Find and activate the correct button based on tab
-    document
-      .querySelector(`.tab-button[onclick*="${tab}"]`)
-      .classList.add("active");
-  }
-
-  document.getElementById("seedlingTable").style.display =
-    tab === "seedling" ? "table" : "none";
-  document.getElementById("growingTable").style.display =
-    tab === "growing" ? "table" : "none";
-
-  loadTrees();
-};
-
 async function loadTrees() {
   try {
-    const [matureSnapshot, growingSnapshot] = await Promise.all([
+    const [seedlingSnapshot] = await Promise.all([
       getDocs(treesCollectionRef),
-      getDocs(growingTreesCollectionRef),
     ]);
 
     // Get filter values
@@ -180,31 +153,17 @@ async function loadTrees() {
       .value.toLowerCase();
     const typeFilter = document.getElementById("typeFilter").value;
 
-    // Load mature trees
-    if (currentTab === "seedling") {
+    // Load trees
       const treeItems = document.getElementById("treeItems");
       treeItems.innerHTML = "";
 
-      matureSnapshot.forEach((doc) => {
+      seedlingSnapshot.forEach((doc) => {
         const tree = { id: doc.id, ...doc.data() };
         if (matchesFilters(tree, searchTerm, typeFilter)) {
           appendTreeToTable(tree, treeItems, true);
         }
       });
-    }
-
-    // Load growing trees
-    if (currentTab === "growing") {
-      const growingItems = document.getElementById("growingTreeItems");
-      growingItems.innerHTML = "";
-
-      growingSnapshot.forEach((doc) => {
-        const tree = { id: doc.id, ...doc.data() };
-        if (matchesFilters(tree, searchTerm, typeFilter)) {
-          appendTreeToTable(tree, growingItems, false);
-        }
-      });
-    }
+    
   } catch (error) {
     console.error("Error loading trees:", error);
     alert("Error loading tree inventory!");
@@ -213,33 +172,24 @@ async function loadTrees() {
 
 async function updateStatistics() {
   try {
-    const [matureSnapshot, growingSnapshot] = await Promise.all([
+    const [seedlingSnapshot] = await Promise.all([
       getDocs(treesCollectionRef),
-      getDocs(growingTreesCollectionRef),
     ]);
 
     let totalTrees = 0;
-    let growingTreesCount = 0;
     let bearingTrees = 0;
     let nonBearingTrees = 0;
 
     // Count mature trees
-    matureSnapshot.forEach((doc) => {
+    seedlingSnapshot.forEach((doc) => {
       const tree = doc.data();
       totalTrees++;
       if (tree.type === "bearing") bearingTrees++;
       else nonBearingTrees++;
     });
 
-    // Count growing trees
-    growingSnapshot.forEach(() => {
-      growingTreesCount++;
-    });
-
     // Update statistics display
     document.getElementById("totalTrees").textContent = totalTrees;
-    document.getElementById("growingTrees").textContent =
-      growingTreesCount;
     document.getElementById("bearingTrees").textContent = bearingTrees;
     document.getElementById("nonBearingTrees").textContent =
       nonBearingTrees;
@@ -279,22 +229,6 @@ function appendTreeToTable(tree, container, isSeedling) {
           </button>
       </td>
     `;
-  } else {
-    row.innerHTML = `
-      <td><img src="${tree.image || "/placeholder-tree.jpg"}" alt="${
-      tree.name
-    }"></td>
-      <td>${tree.name}</td>
-      <td>${tree.description}</td>
-      <td>${tree.type === "bearing" ? "Bearing" : "Non-bearing"}</td>
-      <td>${tree.growthPhase}</td>
-      <td>${lastUpdated}</td>
-      <td class="actions">
-          <button onclick="window.editTree('${tree.id}', false)">
-              <i class="fas fa-edit"></i>
-          </button>
-      </td>
-    `;
   }
 
   container.appendChild(row);
@@ -305,7 +239,6 @@ async function saveTree(event) {
   event.preventDefault();
 
   const treeId = document.getElementById("treeId").value;
-  const growthPhase = document.getElementById("growthPhase").value;
 
   try {
     let imageUrl = null;
@@ -326,77 +259,47 @@ async function saveTree(event) {
       name: document.getElementById("name").value,
       description: document.getElementById("description").value,
       type: document.getElementById("type").value,
-      growthPhase: growthPhase,
       lastUpdated: serverTimestamp(),
     };
 
+    // Check if tree already exists (duplicate check)
+    const existingTreesQuery = query(
+      treesCollectionRef,
+      where("name", "==", treeData.name),
+      where("type", "==", treeData.type)
+    );
+
+    const querySnapshot = await getDocs(existingTreesQuery);
+
+    if (!treeId && !querySnapshot.empty) {
+      // Tree already exists, prevent adding it
+      alert("A tree with the same name and type already exists.");
+      return;
+    }
+
+    // Add or update tree
     if (treeId) {
       // Get existing tree data to preserve image if no new one is uploaded
-      const matureDoc = await getDoc(doc(db, "tree_inventory", treeId));
-      const growingDoc = await getDoc(doc(db, "growing_trees", treeId));
-      const existingData = matureDoc.exists()
-        ? matureDoc.data()
-        : growingDoc.exists()
-        ? growingDoc.data()
-        : null;
+      const seedlingDoc = await getDoc(doc(db, "tree_inventory", treeId));
+      const existingData = seedlingDoc.exists() ? seedlingDoc.data() : null;
 
       // Use existing image if no new one was uploaded
       treeData.image =
         imageUrl || (existingData ? existingData.image : null);
+
+      // Update the existing tree document
+      await updateDoc(doc(db, "tree_inventory", treeId), treeData);
     } else {
       // For new trees, use the uploaded image
       treeData.image = imageUrl;
-    }
-
-    if (growthPhase === "seedling") {
-      // Moving/adding to mature trees collection
-      if (treeId) {
-        const growingDoc = await getDoc(doc(db, "growing_trees", treeId));
-        if (growingDoc.exists()) {
-          // Delete from growing_trees and add to tree_inventory
-          await deleteDoc(doc(db, "growing_trees", treeId));
-          await addDoc(treesCollectionRef, {
-            ...treeData,
-            createdAt: serverTimestamp(),
-          });
-        } else {
-          // Update existing tree in tree_inventory
-          await updateDoc(doc(db, "tree_inventory", treeId), treeData);
-        }
-      } else {
-        // Create new mature tree
-        await addDoc(treesCollectionRef, {
-          ...treeData,
-          createdAt: serverTimestamp(),
-        });
-      }
-    } else {
-      // Moving/adding to growing trees collection
-      if (treeId) {
-        const matureDoc = await getDoc(doc(db, "tree_inventory", treeId));
-        if (matureDoc.exists()) {
-          // Delete from tree_inventory and add to growing_trees
-          await deleteDoc(doc(db, "tree_inventory", treeId));
-          await addDoc(growingTreesCollectionRef, {
-            ...treeData,
-            createdAt: serverTimestamp(),
-          });
-        } else {
-          // Update existing tree in growing_trees
-          await updateDoc(doc(db, "growing_trees", treeId), treeData);
-        }
-      } else {
-        // Create new growing tree
-        await addDoc(growingTreesCollectionRef, {
-          ...treeData,
-          createdAt: serverTimestamp(),
-        });
-      }
+      
+      // Add new tree to Firestore
+      await addDoc(treesCollectionRef, treeData);
     }
 
     alert("Tree saved successfully!");
     modal.style.display = "none";
-    clearForm();
+    clearForm(); // Clear the form
     await updateStatistics(); // Update stats first
     await loadTrees(); // Then update table
   } catch (error) {
@@ -406,25 +309,30 @@ async function saveTree(event) {
 }
 
 // Edit tree
-window.editTree = async function (id, isMature) {
+window.editTree = async function (id) {
   try {
-    const docRef = doc(
-      db,
-      isMature ? "tree_inventory" : "growing_trees",
-      id
-    );
+    const docRef = doc(db, "tree_inventory", id);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      document.getElementById("treeId").value = id;
+
+      // Populate the form with existing tree data
+      document.getElementById("treeId").value = id; // Store treeId to reference it later
       document.getElementById("name").value = data.name;
       document.getElementById("description").value = data.description;
       document.getElementById("type").value = data.type;
-      document.getElementById("growthPhase").value =
-        data.growthPhase || "seedling";
 
-      modal.style.display = "flex";
+      // Show the image preview only if an image exists
+      const imageElement = document.getElementById("treeImagePreview");
+      if (data.image) {
+        imageElement.src = data.image;
+        imageElement.style.display = "block"; // Display the image
+      } else {
+        imageElement.style.display = "none"; // Hide if no image exists
+      }
+
+      modal.style.display = "flex"; // Show the modal for editing
     }
   } catch (error) {
     console.error("Error loading tree details:", error);

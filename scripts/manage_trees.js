@@ -474,6 +474,7 @@ const closeBtn = addTreeModal.querySelector(".close");
 
 addTreeBtn.onclick = () => {
   addTreeModal.style.display = "flex";
+  resetAddTreeForm();
   loadTreeInventory();
 };
 
@@ -481,7 +482,27 @@ closeBtn.onclick = () => {
   addTreeModal.style.display = "none";
   document.getElementById("addTreeForm").reset();
   document.getElementById("treeDetails").style.display = "none";
+  resetAddTreeForm();
 };
+
+// Create a separate reset function
+function resetAddTreeForm() {
+  const addTreeForm = document.getElementById("addTreeForm");
+  const selectTree = document.getElementById("selectTree");
+  const treeDetails = document.getElementById("treeDetails");
+  
+  // Reset the form
+  addTreeForm.reset();
+  
+  // Reset the select dropdown
+  selectTree.selectedIndex = 0;
+  
+  // Hide tree details
+  treeDetails.style.display = "none";
+  
+  // Clear any selected tree data
+  selectedTreeData = null;
+}
 
 // Load trees from inventory
 async function loadTreeInventory() {
@@ -633,6 +654,7 @@ document
       });
 
       alert("Tree added successfully!");
+      resetAddTreeForm();
       addTreeModal.style.display = "none";
       document.getElementById("addTreeForm").reset();
       loadTrees();

@@ -121,9 +121,6 @@ async function fetchData() {
     const treeInventorySnapshot = await getDocs(
       collection(db, "tree_inventory")
     );
-    const growingTreesSnapshot = await getDocs(
-      collection(db, "growing_trees")
-    );
 
     // Process planting requests data
     const plantingData = plantingRequestsSnapshot.docs.map((doc) => ({
@@ -136,14 +133,6 @@ async function fetchData() {
 
     // Count mature trees stocks
     treeInventorySnapshot.docs.forEach((doc) => {
-      const tree = doc.data();
-      // Access the stocks field directly as a number
-      const stockAmount = parseInt(tree.stocks) || 0;
-      speciesCount[tree.name] = (speciesCount[tree.name] || 0) + stockAmount;
-    });
-
-    // Count growing trees stocks
-    growingTreesSnapshot.docs.forEach((doc) => {
       const tree = doc.data();
       // Access the stocks field directly as a number
       const stockAmount = parseInt(tree.stocks) || 0;
@@ -213,8 +202,6 @@ async function fetchData() {
       },
     });
 
-    // Filter completed plantings and organize by month
-    const monthlyPlantings = {};
     const totalTrees = plantingData.filter(
       (plant) => plant.status === "approved"
     ).length;
@@ -397,7 +384,7 @@ function processMonthlyData(plantings) {
   };
 }
 
-// Add this function to generate and download the report
+// Function to generate and download the report
 async function generateReport() {
   try {
     const { jsPDF } = window.jspdf;
@@ -406,51 +393,135 @@ async function generateReport() {
     const pageHeight = pdf.internal.pageSize.height;
     const margin = 20;
 
-    // Add header
-    pdf.setFontSize(20);
-    pdf.setTextColor(56, 161, 105); // Green color from your theme
-    pdf.text('TreeStride Report', pageWidth/2, margin, { align: 'center' });
-    
-    // Add date
+    // Color Palette
+    const colors = {
+      primary: [56, 161, 105],     // Green
+      secondary: [41, 128, 185],    // Blue
+      text: [0, 0, 0],              // Black
+      background: [240, 242, 245]   // Light Gray
+    };
+
+    // Custom Font Setup (ensure these fonts are loaded)
+    pdf.setFont('Helvetica', 'normal');
+
+    // Background
+    pdf.setFillColor(...colors.background);
+    pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    // Add Header with Logo
+    const denrLogoUrl = '../denr_logo.png';
+    pdf.addImage(denrLogoUrl, 'PNG', margin, margin, 30, 30);
+
+    // Title with Modern Typography
+    pdf.setTextColor(...colors.primary);
+    pdf.setFontSize(24);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text('TreeStride Report', pageWidth/2, margin + 20, { 
+      align: 'center',
+      renderingMode: 'fill'
+    });
+
+    // Subtitle
     pdf.setFontSize(12);
-    pdf.setTextColor(0);
+    pdf.setTextColor(...colors.secondary);
+    pdf.setFont('Helvetica', 'normal');
     const date = new Date().toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
-    pdf.text(`Generated on: ${date}`, margin, margin + 12);
+    pdf.text(`Generated on: ${date}`, pageWidth/2, margin + 30, { align: 'center' });
 
-    // Add statistics
+    // Horizontal Line
+    pdf.setLineWidth(0.5);
+    pdf.setDrawColor(...colors.primary);
+    pdf.line(margin, margin + 40, pageWidth - margin, margin + 40);
+
+    // Key Statistics Section
     const totalTrees = document.getElementById('total-trees').textContent;
     const totalSpecies = document.getElementById('total-species').textContent;
     
-    pdf.setFontSize(14);
-    pdf.text('Summary Statistics:', margin, margin + 25);
+    pdf.setFontSize(16);
+    pdf.setTextColor(...colors.text);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text('Executive Summary', margin, margin + 60);
+
     pdf.setFontSize(12);
-    pdf.text(`• Total Trees Planted: ${totalTrees}`, margin + 5, margin + 35);
-    pdf.text(`• Total Tree Species: ${totalSpecies}`, margin + 5, margin + 45);
+    pdf.setFont('Helvetica', 'normal');
+    pdf.setTextColor(...colors.text);
+    pdf.text(`Total Trees Planted:`, margin, margin + 70);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text(totalTrees, margin + 50, margin + 70);
+
+    pdf.setFont('Helvetica', 'normal');
+    pdf.text(`Total Tree Species:`, margin, margin + 80);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text(totalSpecies, margin + 50, margin + 80);
+
+    // Fetch and process tree inventory
+    const db = getFirestore();
+    const treeInventorySnapshot = await getDocs(collection(db, "tree_inventory"));
+    
+    const speciesStocks = {};
+    treeInventorySnapshot.docs.forEach((doc) => {
+      const tree = doc.data();
+      const stockAmount = parseInt(tree.stocks) || 0;
+      speciesStocks[tree.name] = stockAmount;
+    });
+
+    // Species Stocks Section
+    pdf.setFontSize(16);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text('Tree Species Inventory', margin, margin + 100);
+
+    pdf.setFontSize(12);
+    pdf.setFont('Helvetica', 'normal');
+    let yOffset = margin + 110;
+    Object.entries(speciesStocks).forEach(([species, stock], index) => {
+      pdf.text(`${species}:`, margin, yOffset);
+      pdf.setFont('Helvetica', 'bold');
+      pdf.text(`${stock} stocks`, margin + 60, yOffset);
+      pdf.setFont('Helvetica', 'normal');
+      yOffset += 10;
+      
+      if (yOffset > pageHeight - margin) {
+        pdf.addPage();
+        yOffset = margin + 20;
+      }
+    });
 
     // Capture and add charts
     const treesChart = document.getElementById('trees-chart');
     const speciesChart = document.getElementById('species-chart');
     
-    // Capture trees chart
+    // Trees Planted Chart
     const treesCanvas = await html2canvas(treesChart);
     const treesImgData = treesCanvas.toDataURL('image/png');
-    pdf.text('Trees Planted Over Time', margin, margin + 65);
-    pdf.addImage(treesImgData, 'PNG', margin, margin + 70, pageWidth - (margin * 2), 80);
-    
-    // Add species chart on the next page
     pdf.addPage();
+    pdf.setFontSize(16);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text('Trees Planted Over Time', margin, margin);
+    pdf.addImage(treesImgData, 'PNG', margin, margin + 10, pageWidth - (margin * 2), 80);
+    
+    // Species Distribution Chart
     const speciesCanvas = await html2canvas(speciesChart);
     const speciesImgData = speciesCanvas.toDataURL('image/png');
+    pdf.addPage();
+    pdf.setFontSize(16);
+    pdf.setFont('Helvetica', 'bold');
     pdf.text('Tree Species Distribution', margin, margin);
-    pdf.addImage(speciesImgData, 'PNG', margin, margin + 5, pageWidth - (margin * 2), 80);
+    pdf.addImage(speciesImgData, 'PNG', margin, margin + 10, pageWidth - (margin * 2), 80);
 
-    // Add time period info
+    // Footer
     const timePeriod = document.getElementById('timePeriod').value;
-    pdf.text(`Time Period: ${timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1)}`, margin, pageHeight - margin);
+    pdf.setFontSize(10);
+    pdf.setFont('Helvetica', 'normal');
+    pdf.setTextColor(...colors.secondary);
+    pdf.text(`Report Period: ${timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1)}`, 
+      margin, 
+      pageHeight - margin, 
+      { baseline: 'bottom' }
+    );
 
     // Save the PDF
     const fileName = `TreeStride_Report_${new Date().toISOString().split('T')[0]}.pdf`;
