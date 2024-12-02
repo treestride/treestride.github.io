@@ -130,7 +130,7 @@ main {
   .form-group input:focus,
   .form-group select:focus {
     outline: none;
-    border-color: #4299e1;
+    border-color: #38a169;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
   }
   
@@ -212,12 +212,12 @@ main {
   }
   
   .edit-button {
-    background-color: #4299e1;
+    background-color: #2f855a;
     color: white;
   }
   
   .edit-button:hover {
-    background-color: #3182ce;
+    background-color: #2f855a;
   }
   
   /* Pagination Controls */
@@ -278,7 +278,7 @@ main {
   }
   
   .save-button {
-    background-color: #4299e1;
+    background-color: #2f855a;
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -289,7 +289,7 @@ main {
   }
   
   .save-button:hover {
-    background-color: #3182ce;
+    background-color: #2f855a;
   }
   
   /* Empty State */
@@ -390,6 +390,10 @@ main {
     margin: 15px 0;
   }
 
+  .admin-password-dialog input{
+    padding: 0.4rem;
+    width: 100%;
+  }
   .admin-password-dialog .dialog-buttons {
     display: flex;
     justify-content: space-between;
@@ -411,12 +415,14 @@ main {
   }
   
   .loading-spinner {
+    display: block;
     background: white;
     padding: 20px;
     border-radius: 8px;
     text-align: center;
+    color: black;
   }
-  
+
   .spinner {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #38a169;
@@ -443,4 +449,46 @@ main {
   .cancel-button{
     background-color: transparent!important;
     color: black!important;
+  }
+
+  .loading-overlay-2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  @keyframes spin2 {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .navigation.hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  
+  .spinner-2 {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #38a169;
+    border-radius: 50%;
+    animation: spin2 1s linear infinite;
+  }
+
+  @keyframes spin2 {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .navigation.hidden {
+    visibility: hidden;
+    pointer-events: none;
   }
