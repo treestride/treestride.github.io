@@ -215,7 +215,7 @@ document
         lastUpdated: serverTimestamp(),
       });
 
-      alert(`Stock added successfully!`);
+      alert(`Stocks updated successfully!`);
       document.getElementById("stockForm").reset();
       loadStockHistory();
       updateCurrentStockDisplay();
