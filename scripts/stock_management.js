@@ -44,8 +44,23 @@ const PAGE_PERMISSIONS = {
   'staffs.html': ['admin']
 };
 
+// Add loading state management
+function showLoading() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  document.querySelector('.navigation').classList.add('hidden');
+  document.getElementById('sign-out').disabled = true;
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.querySelector('.navigation').classList.remove('hidden');
+  document.getElementById('sign-out').disabled = false;
+}
+
 // Check authentication state
 onAuthStateChanged(auth, async (user) => {
+  showLoading();
+
   if (user) {
     const email = user.email;
     const userRoleDisplay = document.getElementById('user-role-display');
@@ -53,6 +68,7 @@ onAuthStateChanged(auth, async (user) => {
     // Allow admin full access
     if (email === "admin@gmail.com") {
       userRoleDisplay.textContent = "Admin";
+      hideLoading();
       return;
     }
 
@@ -93,6 +109,8 @@ onAuthStateChanged(auth, async (user) => {
           link.style.display = 'none';
         }
       }
+
+      hideLoading();
     } catch (error) {
       console.error("Error checking permissions:", error);
       window.location.href = "../index.html";
@@ -111,7 +129,7 @@ document.getElementById("sign-out").addEventListener("click", () => {
 
 // Pagination state
 let currentPage = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 5;
 let stockEntries = [];
 
 // Load trees into select dropdown

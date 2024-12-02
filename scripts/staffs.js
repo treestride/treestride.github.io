@@ -51,6 +51,19 @@ const PAGE_PERMISSIONS = {
   'staffs.html': ['admin']
 };
 
+// Add loading state management
+function showLoading() {
+  document.getElementById('loadingOverlay-2').style.display = 'flex';
+  document.querySelector('.navigation').classList.add('hidden');
+  document.getElementById('sign-out').disabled = true;
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay-2').style.display = 'none';
+  document.querySelector('.navigation').classList.remove('hidden');
+  document.getElementById('sign-out').disabled = false;
+}
+
 // After initializing Firebase, set persistence
 await setPersistence(auth, browserLocalPersistence);
 
@@ -59,6 +72,10 @@ let isCreatingAccount = false;
 let isAdminReauthenticating = false;
 
 onAuthStateChanged(auth, async (user) => {
+  if (!isCreatingAccount && !isAdminReauthenticating) {
+    showLoading();
+  }
+  
   // Don't perform redirects if we're in the middle of account creation
   if (isCreatingAccount || isAdminReauthenticating) {
     return;
@@ -71,6 +88,7 @@ onAuthStateChanged(auth, async (user) => {
     // Allow admin full access
     if (email === "admin@gmail.com") {
       userRoleDisplay.textContent = "Admin";
+      hideLoading();
       fetchStaffAccounts();
       return;
     }
@@ -114,6 +132,8 @@ onAuthStateChanged(auth, async (user) => {
       if (currentPage === 'staffs.html') {
         fetchStaffAccounts();
       }
+
+      hideLoading();
 
     } catch (error) {
       console.error("Error checking permissions:", error);

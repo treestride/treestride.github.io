@@ -52,8 +52,22 @@ const PAGE_PERMISSIONS = {
   'staffs.html': ['admin']
 };
 
+// Add loading state management
+function showLoading() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  document.querySelector('.navigation').classList.add('hidden');
+  document.getElementById('sign-out').disabled = true;
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.querySelector('.navigation').classList.remove('hidden');
+  document.getElementById('sign-out').disabled = false;
+}
+
 // Check authentication state
 onAuthStateChanged(auth, async (user) => {
+  showLoading();
   if (user) {
     const email = user.email;
     const userRoleDisplay = document.getElementById('user-role-display');
@@ -61,6 +75,7 @@ onAuthStateChanged(auth, async (user) => {
     // Allow admin full access
     if (email === "admin@gmail.com") {
       userRoleDisplay.textContent = "Admin";
+      hideLoading();
       return;
     }
 
@@ -101,6 +116,7 @@ onAuthStateChanged(auth, async (user) => {
           link.style.display = 'none';
         }
       }
+      hideLoading();
     } catch (error) {
       console.error("Error checking permissions:", error);
       window.location.href = "../index.html";
@@ -141,6 +157,10 @@ function clearForm() {
   document.getElementById("treeId").value = "";
 }
 
+const ITEMS_PER_PAGE = 5; // Number of items per page
+let currentPage = 1;
+let filteredTrees = []; // Store all filtered trees
+
 async function loadTrees() {
   try {
     const [seedlingSnapshot] = await Promise.all([
@@ -153,20 +173,94 @@ async function loadTrees() {
       .value.toLowerCase();
     const typeFilter = document.getElementById("typeFilter").value;
 
-    // Load trees
-      const treeItems = document.getElementById("treeItems");
-      treeItems.innerHTML = "";
+    // Filter trees
+    filteredTrees = [];
+    seedlingSnapshot.forEach((doc) => {
+      const tree = { id: doc.id, ...doc.data() };
+      if (matchesFilters(tree, searchTerm, typeFilter)) {
+        filteredTrees.push(tree);
+      }
+    });
 
-      seedlingSnapshot.forEach((doc) => {
-        const tree = { id: doc.id, ...doc.data() };
-        if (matchesFilters(tree, searchTerm, typeFilter)) {
-          appendTreeToTable(tree, treeItems, true);
-        }
-      });
+    // Reset to first page when filters change
+    currentPage = 1;
     
+    // Render trees with pagination
+    renderTrees();
+    renderPagination();
   } catch (error) {
     console.error("Error loading trees:", error);
     alert("Error loading tree inventory!");
+  }
+}
+
+function renderTrees() {
+  const treeItems = document.getElementById("treeItems");
+  treeItems.innerHTML = "";
+
+  // Calculate start and end indices for current page
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const pageTrees = filteredTrees.slice(startIndex, endIndex);
+
+  pageTrees.forEach(tree => {
+    appendTreeToTable(tree, treeItems, true);
+  });
+}
+
+function renderPagination() {
+  const paginationContainer = document.getElementById("paginationContainer");
+  if (!paginationContainer) {
+    // Create pagination container if it doesn't exist
+    const container = document.createElement("div");
+    container.id = "paginationContainer";
+    container.className = "pagination";
+    document.querySelector(".content").appendChild(container);
+  }
+
+  // Clear previous pagination
+  paginationContainer.innerHTML = "";
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredTrees.length / ITEMS_PER_PAGE);
+
+  // Previous button
+  if (currentPage > 1) {
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "&laquo; Previous";
+    prevButton.addEventListener("click", () => {
+      currentPage--;
+      renderTrees();
+      renderPagination();
+    });
+    paginationContainer.appendChild(prevButton);
+  }
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.textContent = i;
+    if (i === currentPage) {
+      pageButton.classList.add("active");
+    }
+    pageButton.addEventListener("click", () => {
+      currentPage = i;
+      renderTrees();
+      renderPagination();
+    });
+    paginationContainer.appendChild(pageButton);
+  }
+
+  // Next button
+  if (currentPage < totalPages) {
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "Next &raquo;";
+    nextButton.addEventListener("click", () => {
+      currentPage++;
+      renderTrees();
+      renderPagination();
+    });
+    paginationContainer.appendChild(nextButton);
   }
 }
 
@@ -352,16 +446,22 @@ signOutButton.addEventListener("click", () => {
     });
 });
 
+// Modify existing initialization
 async function initializePage() {
   await updateStatistics();
   await loadTrees();
 }
 
-// Event listeners
-document.getElementById("saveTree").addEventListener("click", saveTree);
+// Update event listeners to work with pagination
+document.getElementById("saveTree").addEventListener("click", async (event) => {
+  await saveTree(event);
+  await initializePage(); // Reload and re-render after saving
+});
+
 document
   .getElementById("searchInput")
   .addEventListener("input", loadTrees);
+
 document
   .getElementById("typeFilter")
   .addEventListener("change", loadTrees);
