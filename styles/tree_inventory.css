@@ -406,3 +406,23 @@ header h1{
   color: white;
   border-color: #3a9249;
 }
+
+.stock-entries {
+  margin-top: 20px;
+}
+
+.stock-entries-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stock-entries-table th, 
+.stock-entries-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.stock-entries-table thead {
+  background-color: #f2f2f2;
+}
