@@ -10,6 +10,9 @@ import {
   serverTimestamp,
   query,
   where,
+  orderBy,
+  limit,
+  startAfter,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage,
@@ -38,6 +41,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const treesCollectionRef = collection(db, "tree_inventory");
+const stockEntriesCollectionRef = collection(db, "stock_entries");
 
 const PAGE_PERMISSIONS = {
   'dashboard.html': ['admin', 'sub-admin', 'forester'],
@@ -46,11 +50,17 @@ const PAGE_PERMISSIONS = {
   'planting_requests.html': ['admin', 'sub-admin'],
   'tree_inventory.html': ['admin', 'sub-admin', 'forester'],
   'manage_trees.html': ['admin', 'sub-admin', 'forester'],
-  'stock_management.html': ['admin', 'sub-admin', 'forester'],
+  'goal_cms.html': ['admin', 'sub-admin'],
   'reported_posts.html': ['admin', 'sub-admin'],
-  'users.html': ['admin'], // Only admin can access
+  'users.html': ['admin'], 
   'staffs.html': ['admin']
 };
+
+// Pagination constants for stock entries
+const STOCK_ENTRIES_PER_PAGE = 5;
+let currentStockEntriesPage = 1;
+let lastStockEntrySnapshot = null;
+let totalStockEntries = 0;
 
 // Add loading state management
 function showLoading() {
@@ -192,6 +202,114 @@ async function loadTrees() {
     console.error("Error loading trees:", error);
     alert("Error loading tree inventory!");
   }
+}
+
+// Log stock entry function
+async function logStockEntry(treeId, operation, quantity) {
+  try {
+    // Get the tree name for logging
+    const treeDoc = await getDoc(doc(db, "tree_inventory", treeId));
+    const treeName = treeDoc.exists() ? treeDoc.data().name : "Unknown Tree";
+
+    // Prepare stock entry data
+    const stockEntryData = {
+      treeId: treeId,
+      treeName: treeName,
+      operation: operation,
+      quantity: quantity,
+      timestamp: serverTimestamp(),
+      notes: `Stock ${operation} for ${treeName}`
+    };
+
+    // Add to stock_entries collection
+    await addDoc(stockEntriesCollectionRef, stockEntryData);
+  } catch (error) {
+    console.error("Error logging stock entry:", error);
+  }
+}
+
+// Load and display stock entries
+async function loadStockEntries() {
+  try {
+    const stockEntriesTable = document.getElementById("stockEntriesTable");
+    const stockEntriesBody = document.getElementById("stockEntriesBody");
+    stockEntriesBody.innerHTML = ""; // Clear previous entries
+
+    // Query to get stock entries with pagination
+    let q = query(
+      stockEntriesCollectionRef, 
+      orderBy("timestamp", "desc"),
+      limit(STOCK_ENTRIES_PER_PAGE)
+    );
+
+    // If not first page, use the last document from previous query
+    if (currentStockEntriesPage > 1 && lastStockEntrySnapshot) {
+      q = query(
+        stockEntriesCollectionRef, 
+        orderBy("timestamp", "desc"),
+        startAfter(lastStockEntrySnapshot),
+        limit(STOCK_ENTRIES_PER_PAGE)
+      );
+    }
+
+    const snapshot = await getDocs(q);
+
+    // Update last document for next pagination
+    if (!snapshot.empty) {
+      lastStockEntrySnapshot = snapshot.docs[snapshot.docs.length - 1];
+    }
+
+    // Render stock entries
+    snapshot.forEach((doc) => {
+      const entry = doc.data();
+      const row = document.createElement("tr");
+      
+      // Format timestamp
+      const timestamp = entry.timestamp 
+        ? new Date(entry.timestamp.toDate()).toLocaleString() 
+        : "N/A";
+
+      row.innerHTML = `
+        <td>${entry.treeName}</td>
+        <td>${entry.operation}</td>
+        <td>${entry.quantity}</td>
+        <td>${timestamp}</td>
+        <td>${entry.notes || ''}</td>
+      `;
+      stockEntriesBody.appendChild(row);
+    });
+
+    // Render stock entries pagination
+    renderStockEntriesPagination();
+  } catch (error) {
+    console.error("Error loading stock entries:", error);
+  }
+}
+
+// Render stock entries pagination
+function renderStockEntriesPagination() {
+  const stockEntriesPaginationContainer = document.getElementById("stockEntriesPaginationContainer");
+  stockEntriesPaginationContainer.innerHTML = ""; // Clear previous pagination
+
+  // Previous button
+  if (currentStockEntriesPage > 1) {
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "&laquo; Previous";
+    prevButton.addEventListener("click", () => {
+      currentStockEntriesPage--;
+      loadStockEntries();
+    });
+    stockEntriesPaginationContainer.appendChild(prevButton);
+  }
+
+  // Next button
+  const nextButton = document.createElement("button");
+  nextButton.innerHTML = "Next &raquo;";
+  nextButton.addEventListener("click", () => {
+    currentStockEntriesPage++;
+    loadStockEntries();
+  });
+  stockEntriesPaginationContainer.appendChild(nextButton);
 }
 
 function renderTrees() {
@@ -434,6 +552,108 @@ window.editTree = async function (id) {
   }
 };
 
+// Populate tree select dropdown
+async function populateTreeSelect() {
+  const treeSelect = document.getElementById('treeSelect');
+  treeSelect.innerHTML = '<option value="">Select a Tree</option>'; // Reset
+
+  try {
+    const seedlingSnapshot = await getDocs(treesCollectionRef);
+    
+    seedlingSnapshot.forEach((doc) => {
+      const tree = { id: doc.id, ...doc.data() };
+      const option = document.createElement('option');
+      option.value = tree.id;
+      option.textContent = `${tree.name} (${tree.type}) - Current Stock: ${tree.stocks || 0}`;
+      treeSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error populating tree select:", error);
+    alert("Error loading trees for stock management!");
+  }
+}
+
+// Add stock modal functionality
+const stockModal = document.getElementById("stockModal");
+const addStockBtn = document.getElementById("addStock");
+const stockCloseBtn = stockModal.querySelector(".close");
+
+addStockBtn.onclick = () => {
+  populateTreeSelect();
+  stockModal.style.display = "flex";
+};
+
+stockCloseBtn.onclick = () => {
+  stockModal.style.display = "none";
+  document.getElementById("stockForm").reset();
+};
+
+// Save stock changes
+async function saveStockChanges(event) {
+  event.preventDefault();
+
+  const treeId = document.getElementById('treeSelect').value;
+  const operation = document.getElementById('stockOperation').value;
+  const stockAmount = parseInt(document.getElementById('stockAmount').value);
+
+  if (!treeId || !operation || !stockAmount) {
+    alert("Please fill all fields correctly!");
+    return;
+  }
+
+  try {
+    const treeRef = doc(db, "tree_inventory", treeId);
+    const treeDoc = await getDoc(treeRef);
+
+    if (!treeDoc.exists()) {
+      alert("Selected tree not found!");
+      return;
+    }
+
+    const treeData = treeDoc.data();
+    let currentStocks = treeData.stocks || 0;
+
+    // Perform stock operation
+    switch (operation) {
+      case 'delivered':
+      case 'grown':
+        currentStocks += stockAmount;
+        break;
+      case 'requested':
+        if (stockAmount > currentStocks) {
+          alert(`Insufficient stocks! Current stock: ${currentStocks}`);
+          return;
+        }
+        currentStocks -= stockAmount;
+        break;
+    }
+
+    // Update the tree document
+    await updateDoc(treeRef, {
+      stocks: currentStocks,
+      lastUpdated: serverTimestamp()
+    });
+
+    // Log the stock entry
+    await logStockEntry(treeId, operation, stockAmount);
+
+    alert("Stock updated successfully!");
+    stockModal.style.display = "none";
+    document.getElementById("stockForm").reset();
+    
+    await updateStatistics(); // Update global stats
+    await loadTrees(); // Reload and re-render the trees
+    await loadStockEntries(); // Reload stock entries
+  } catch (error) {
+    console.error("Error updating stocks:", error);
+    alert("Error updating stocks!");
+  }
+}
+
+
+// Add event listener for saving stock changes
+document.getElementById("saveStock").addEventListener("click", saveStockChanges);
+
 // Sign out function
 const signOutButton = document.getElementById("sign-out");
 signOutButton.addEventListener("click", () => {
@@ -450,6 +670,7 @@ signOutButton.addEventListener("click", () => {
 async function initializePage() {
   await updateStatistics();
   await loadTrees();
+  await loadStockEntries();
 }
 
 // Update event listeners to work with pagination

@@ -46,9 +46,9 @@
         'planting_requests.html': ['admin', 'sub-admin'],
         'tree_inventory.html': ['admin', 'sub-admin', 'forester'],
         'manage_trees.html': ['admin', 'sub-admin', 'forester'],
-        'stock_management.html': ['admin', 'sub-admin', 'forester'],
+        'goal_cms.html': ['admin', 'sub-admin'],
         'reported_posts.html': ['admin', 'sub-admin'],
-        'users.html': ['admin'], // Only admin can access
+        'users.html': ['admin'], 
         'staffs.html': ['admin']
       };
 
