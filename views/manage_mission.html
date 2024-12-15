@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TreeStride - Manage Mission</title>
+    <title>Manage Missions</title>
     <link rel="stylesheet" href="../styles/manage_mission.css" />
   </head>
   <body>
     <header>
       <div>
-        <h1>Manage Mission</h1>
+        <h1>Manage Missions (App)</h1>
       </div>
       <div class="user">
         <h3 id="user-role-display" style="color: #38a169"></h3>
@@ -23,168 +23,382 @@
       <div class="spinner"></div>
     </div>
     <main>
-      <section class="two-column">
-        <section class="navigation">
-          <button id="updateMission">
-            <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-          <div>
-            <img
-              src="../denr_logo.png"
-              alt="DENR Dagupan Logo"
-              height="120px"
-              width="120px"
-              style="margin: auto"
-            />
-            <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
-              TreeStride
-            </h1>
-            <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-home"></i> Dashboard</a
-            >
-            <a
-              href="manage_mission.html"
-              style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-tasks"></i> Manage Mission</a
-            >
-            <a
-              href="announcements.html"
-              style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-bullhorn"></i> Announcements</a
-            >
-            <a
-              href="planting_requests.html"
-              style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-seedling"></i> Planting Requests</a
-            >
-            <a
-              href="tree_inventory.html"
-              style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-hand-paper"></i> Tree Inventory</a
-            >
-            <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-tree"></i> Manage Trees (App)</a
-            >
-            <a
-              href="stock_management.html"
-              style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-boxes"></i> Stock Management</a
-            >
-            <a
-              href="reported_posts.html"
-              style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
-            >
-            <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
-            >
-            <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
-              ><i class="fas fa-user-plus"></i> Manage Staffs</a
-            >
-          </div>
-        </section>
-        <section class="mission">
-          <div>
-            <h1 id="displaySteps">No Mission/Initializing</h1>
-            <h3>Required Steps</h3>
-          </div>
-          <div>
-            <h1 id="displayReward">No Mission/Initializing</h1>
-            <h3>Reward</h3>
-          </div>
-          <div>
-            <h1 id="displayEndDate">No Mission/Initializing</h1>
-            <h3>End Date</h3>
-          </div>
-        </section>
+      <section class="navigation">
+        <div>
+          <img
+            src="../denr_logo.png"
+            alt="DENR Dagupan Logo"
+            height="120px"
+            width="120px"
+            style="margin: auto"
+          />
+          <h1 style="font-size: 2rem; text-align: center; font-weight: bold">
+            TreeStride
+          </h1>
+          <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-home"></i> Dashboard</a
+          >
+          <a href="manage_mission.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tasks"></i> Solo Mission</a
+          >
+          <a href="group_mission.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tasks"></i> Group Mission</a
+          >
+          <a href="announcements.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-bullhorn"></i> Announcements</a
+          >
+          <a
+            href="planting_requests.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-seedling"></i> Planting Requests</a
+          >
+          <a href="tree_inventory.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-hand-paper"></i> Tree Inventory</a
+          >
+          <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tree"></i> Manage Trees (App)</a
+          >
+          <a href="goal_cms.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-shoe-prints"></i>Manage Goals (App)</a
+          >
+          <a href="reported_posts.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
+          >
+          <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-users-gear"></i> Users (TreeStride)</a
+          >
+          <a href="staffs.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-user-plus"></i> Manage Staffs</a
+          >
+        </div>
+      </section>
+      <section>
+        <h2>Active Mission</h2>
+        <div id="activeMission">
+          <p>Steps: <span id="activeSteps">Loading...</span></p>
+          <p>Reward: <span id="activeReward">Loading...</span></p>
+          <p>End Date: <span id="activeEndDate">Loading...</span></p>
+        </div>
+      </section>
 
-        <section class="progress-section">
-          <h1>Users In Progress</h1>
-          <table id="userTable">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Mission Steps</th>
-                <th>Progress</th>
-                <th>Missions Completed</th>
-              </tr>
-            </thead>
-            <tbody id="userProgress">
-              <tr class="no-data">
-                <td colspan="4">Loading user data...</td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="pagination">
-            <button id="prevPage" disabled>Previous</button>
-            <span id="pageDisplay">Page 1</span>
-            <button id="nextPage">Next</button>
-          </div>
-        </section>
+      <section>
+        <h2>Add New Mission</h2>
+        <form id="addMissionForm">
+          <label for="steps">Steps:</label>
+          <input type="number" id="steps" name="steps" required />
 
-        <section class="progress-section completed-section">
-          <h1>Users Completed</h1>
-          <table id="completedTable">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Mission Steps</th>
-                <th>Missions Completed</th>
-              </tr>
-            </thead>
-            <tbody id="completedProgress">
-              <tr class="no-data">
-                <td colspan="3">Loading completed missions...</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+          <label for="reward">Reward:</label>
+          <input type="text" id="reward" name="reward" required />
+
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate" name="endDate" required />
+
+          <button type="submit">Add Mission</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Mission Queue</h2>
+        <ul id="missionQueue">
+          Loading...
+        </ul>
       </section>
     </main>
-
-    <!-- The Modal -->
-    <div id="missionModal" class="modal">
-      <!-- Modal content -->
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <form id="missionForm">
-          <label for="steps">Steps:</label>
-          <select id="steps" name="steps" aria-label="Select Steps">
-            <option>250</option>
-            <option>30000</option>
-            <option>50000</option>
-            <option>55000</option>
-            <option>60000</option>
-            <option>70000</option>
-          </select>
-          <label for="reward">Reward:</label>
-          <select id="reward" name="reward" aria-label="Select Reward">
-            <option>1000</option>
-            <option>10000</option>
-            <option>20000</option>
-            <option>30000</option>
-            <option>40000</option>
-            <option>50000</option>
-          </select>
-          <label for="endDate">End Date:</label>
-          <input
-            type="date"
-            id="endDate"
-            name="endDate"
-            aria-label="Select End Date"
-            required
-            min=""
-          />
-
-          <button type="button" id="saveMission">SAVE</button>
-        </form>
-      </div>
-    </div>
-
     <script
       src="https://kit.fontawesome.com/ec19991922.js"
       crossorigin="anonymous"
     ></script>
-    <script type="module" src="../scripts/manage_mission.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        getDoc,
+        addDoc,
+        collection,
+        query,
+        orderBy,
+        getDocs,
+        deleteDoc,
+        limit,
+        where,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
+        authDomain: "treestride-project.firebaseapp.com",
+        projectId: "treestride-project",
+        storageBucket: "treestride-project.appspot.com",
+        messagingSenderId: "218404996569",
+        appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
+        measurementId: "G-XR01C3LFWD",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      const PAGE_PERMISSIONS = {
+        "dashboard.html": ["admin", "sub-admin", "forester"],
+        "manage_mission.html": ["admin", "sub-admin"],
+        "announcements.html": ["admin", "sub-admin"],
+        "planting_requests.html": ["admin", "sub-admin"],
+        "tree_inventory.html": ["admin", "sub-admin", "forester"],
+        "manage_trees.html": ["admin", "sub-admin", "forester"],
+        "goal_cms.html": ["admin", "sub-admin"],
+        "reported_posts.html": ["admin", "sub-admin"],
+        "users.html": ["admin"],
+        "staffs.html": ["admin"],
+      };
+
+      // Add loading state management
+      function showLoading() {
+        document.getElementById("loadingOverlay").style.display = "flex";
+        document.querySelector(".navigation").classList.add("hidden");
+        document.getElementById("sign-out").disabled = true;
+      }
+
+      function hideLoading() {
+        document.getElementById("loadingOverlay").style.display = "none";
+        document.querySelector(".navigation").classList.remove("hidden");
+        document.getElementById("sign-out").disabled = false;
+      }
+
+      // Check authentication state
+      onAuthStateChanged(auth, async (user) => {
+        showLoading();
+        if (user) {
+          const email = user.email;
+          const userRoleDisplay = document.getElementById("user-role-display");
+
+          // Allow admin full access
+          if (email === "admin@gmail.com") {
+            userRoleDisplay.textContent = "Admin";
+            hideLoading();
+            return;
+          }
+
+          try {
+            // Get user role from Firestore
+            const staffDoc = await getDoc(doc(db, "staffs", user.uid));
+            if (!staffDoc.exists()) {
+              throw new Error("Staff document not found");
+            }
+
+            const userRole = staffDoc.data().role;
+            const currentPage = window.location.pathname.split("/").pop();
+            const userData = staffDoc.data();
+            userRoleDisplay.textContent = `${userData.username} (${userData.role})`;
+
+            // Check page access
+            const allowedRoles = PAGE_PERMISSIONS[currentPage] || [];
+            if (!allowedRoles.includes(userRole)) {
+              if (userRole === "forester") {
+                // Redirect foresters to tree inventory
+                window.location.href = "dashboard.html";
+              } else {
+                // Redirect sub-admins to dashboard
+                window.location.href = "dashboard.html";
+              }
+              return;
+            }
+
+            // Update navigation visibility
+            const navigation = document.querySelector(".navigation");
+            const links = navigation.getElementsByTagName("a");
+
+            for (let link of links) {
+              const href = link.getAttribute("href");
+              const linkAllowedRoles = PAGE_PERMISSIONS[href] || [];
+
+              if (!linkAllowedRoles.includes(userRole)) {
+                link.style.display = "none";
+              }
+            }
+
+            hideLoading();
+          } catch (error) {
+            console.error("Error checking permissions:", error);
+            window.location.href = "../index.html";
+          }
+        } else {
+          window.location.href = "../index.html";
+        }
+      });
+
+      const activeMissionRef = doc(db, "mission", "currentMission");
+      const missionQueueRef = collection(db, "missionQueue");
+
+      async function loadActiveMission() {
+        const docSnap = await getDoc(activeMissionRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          document.getElementById("activeSteps").textContent = data.steps;
+          document.getElementById("activeReward").textContent = data.reward;
+          document.getElementById("activeEndDate").textContent = new Date(
+            data.endDate
+          ).toLocaleDateString();
+
+          // Check if mission has ended
+          await checkMissionEnd(data.endDate);
+        } else {
+          document.getElementById("activeMission").textContent =
+            "No active mission.";
+          // Try to load next mission from queue
+          await loadNextMissionFromQueue();
+        }
+      }
+
+      async function loadNextMissionFromQueue() {
+        const q = query(missionQueueRef, orderBy("endDate"), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const nextMissionDoc = querySnapshot.docs[0];
+          const nextMissionData = nextMissionDoc.data();
+
+          await setDoc(activeMissionRef, nextMissionData);
+          await deleteDoc(nextMissionDoc.ref);
+
+          loadActiveMission();
+          loadMissionQueue();
+        }
+      }
+
+      async function checkMissionEnd(endDate) {
+        const now = new Date();
+        const missionEnd = new Date(endDate);
+
+        if (missionEnd <= now) {
+          await loadNextMissionFromQueue();
+        }
+      }
+
+      async function isDateOverlapping(newStartDate, newEndDate) {
+        // Check if the new mission overlaps with active mission
+        const activeMissionSnap = await getDoc(activeMissionRef);
+        if (activeMissionSnap.exists()) {
+          const activeMission = activeMissionSnap.data();
+          const activeStart = new Date(
+            activeMission.startDate || activeMission.endDate
+          );
+          const activeEnd = new Date(activeMission.endDate);
+
+          if (
+            new Date(newStartDate) <= activeEnd &&
+            new Date(newEndDate) >= activeStart
+          ) {
+            return true;
+          }
+        }
+
+        // Check if the new mission overlaps with any mission in the queue
+        const q = query(missionQueueRef);
+        const querySnapshot = await getDocs(q);
+
+        for (const docSnap of querySnapshot.docs) {
+          const mission = docSnap.data();
+          const missionStart = new Date(mission.startDate || mission.endDate);
+          const missionEnd = new Date(mission.endDate);
+
+          if (
+            new Date(newStartDate) <= missionEnd &&
+            new Date(newEndDate) >= missionStart
+          ) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      async function addMissionToQueue(steps, reward, endDate) {
+        // Get today's date as the start date
+        const startDate = new Date().toISOString().split("T")[0];
+
+        // Check for date overlap
+        const isOverlapping = await isDateOverlapping(startDate, endDate);
+
+        if (isOverlapping) {
+          alert(
+            "This mission overlaps with an existing mission. Please choose a different date."
+          );
+          return false;
+        }
+
+        await addDoc(missionQueueRef, {
+          steps,
+          reward,
+          endDate,
+          startDate,
+        });
+
+        loadMissionQueue();
+        return true;
+      }
+
+      async function loadMissionQueue() {
+        const q = query(missionQueueRef, orderBy("endDate"));
+        const querySnapshot = await getDocs(q);
+
+        const queueList = document.getElementById("missionQueue");
+        queueList.innerHTML = "";
+
+        if (querySnapshot.empty) {
+          queueList.innerHTML = "<li>No missions in queue.</li>";
+          return;
+        }
+
+        querySnapshot.forEach((doc) => {
+          const mission = doc.data();
+          const listItem = document.createElement("li");
+          listItem.textContent = `Steps: ${mission.steps}, Reward: ${
+            mission.reward
+          }, End Date: ${new Date(mission.endDate).toLocaleDateString()}`;
+
+          // Add button to make this mission active
+          const makeActiveButton = document.createElement("button");
+          makeActiveButton.textContent = "Make Active";
+          makeActiveButton.addEventListener("click", async () => {
+            await setDoc(activeMissionRef, mission);
+            await deleteDoc(doc.ref);
+            loadActiveMission();
+            loadMissionQueue();
+            alert("Mission is now active.");
+          });
+
+          listItem.appendChild(makeActiveButton);
+          queueList.appendChild(listItem);
+        });
+      }
+
+      document
+        .getElementById("addMissionForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const steps = document.getElementById("steps").value;
+          const reward = document.getElementById("reward").value;
+          const endDate = document.getElementById("endDate").value;
+
+          const added = await addMissionToQueue(steps, reward, endDate);
+          if (added) {
+            alert("Mission added to queue.");
+            e.target.reset();
+          }
+        });
+
+      // Initial load
+      loadActiveMission();
+      loadMissionQueue();
+
+      // Periodically check for mission end (every 5 minutes)
+      setInterval(loadActiveMission, 5 * 60 * 1000);
+    </script>
   </body>
 </html>

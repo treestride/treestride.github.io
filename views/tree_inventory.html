@@ -38,10 +38,19 @@
           <a href="dashboard.html" style="font-size: 1rem; padding: 0.6rem"
             ><i class="fas fa-home"></i> Dashboard</a
           >
-          <a href="manage_mission.html" style="font-size: 1rem; padding: 0.6rem"
-            ><i class="fas fa-tasks"></i> Manage Mission</a
+          <a
+            href="manage_mission.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tasks"></i> Solo Mission</a
           >
-          <a href="announcements.html" style="font-size: 1rem; padding: 0.6rem"
+          <a
+            href="group_mission.html"
+            style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-tasks"></i> Group Mission</a
+          >
+          <a
+            href="announcements.html"
+            style="font-size: 1rem; padding: 0.6rem"
             ><i class="fas fa-bullhorn"></i> Announcements</a
           >
           <a
@@ -49,18 +58,20 @@
             style="font-size: 1rem; padding: 0.6rem"
             ><i class="fas fa-seedling"></i> Planting Requests</a
           >
-          <a href="tree_inventory.html" style="font-size: 1rem; padding: 0.6rem"
+          <a
+            href="tree_inventory.html"
+            style="font-size: 1rem; padding: 0.6rem"
             ><i class="fas fa-hand-paper"></i> Tree Inventory</a
           >
           <a href="manage_trees.html" style="font-size: 1rem; padding: 0.6rem"
             ><i class="fas fa-tree"></i> Manage Trees (App)</a
           >
-          <a
-            href="stock_management.html"
-            style="font-size: 1rem; padding: 0.6rem"
-            ><i class="fas fa-boxes"></i> Stock Management</a
+          <a href="goal_cms.html" style="font-size: 1rem; padding: 0.6rem"
+            ><i class="fas fa-shoe-prints"></i>Manage Goals (App)</a
           >
-          <a href="reported_posts.html" style="font-size: 1rem; padding: 0.6rem"
+          <a
+            href="reported_posts.html"
+            style="font-size: 1rem; padding: 0.6rem"
             ><i class="fas fa-exclamation-triangle"></i> Reported Posts</a
           >
           <a href="users.html" style="font-size: 1rem; padding: 0.6rem"
@@ -94,6 +105,10 @@
             <i class="fa-solid fa-plus"></i>
             Add Tree
           </button>
+          <button id="addStock">
+            <i class="fa-solid fa-boxes-packing"></i>
+            Add Stock
+          </button>
         </div>
 
         <div class="filters">
@@ -126,8 +141,27 @@
           <tbody id="treeItems"></tbody>
         </table>
         <div id="paginationContainer" class="pagination"></div>
+
+        <!-- Stock Entries Section -->
+        <section class="stock-entries">
+          <h2>Stock Entries Log</h2>
+          <table class="stock-entries-table" id="stockEntriesTable">
+            <thead>
+              <tr>
+                <th>Tree Name</th>
+                <th>Operation</th>
+                <th>Quantity</th>
+                <th>Timestamp</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="stockEntriesBody"></tbody>
+          </table>
+          <div id="stockEntriesPaginationContainer" class="pagination"></div>
+        </section>
       </section>
     </main>
+
     <div id="treeModal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
@@ -157,6 +191,30 @@
           />
 
           <button type="button" id="saveTree">Save Tree</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="stockModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="stockForm">
+          <label for="treeSelect">Select Tree:</label>
+          <select id="treeSelect" required>
+            <!-- Trees will be populated dynamically -->
+          </select>
+
+          <label for="stockOperation">Operation:</label>
+          <select id="stockOperation" required>
+            <option value="delivered">Delivered</option>
+            <option value="requested">Requested</option>
+            <option value="grown">Grown</option>
+          </select>
+
+          <label for="stockAmount">Stocks:</label>
+          <input type="number" id="stockAmount" min="1" required />
+
+          <button type="button" id="saveStock">Save Stock Changes</button>
         </form>
       </div>
     </div>
