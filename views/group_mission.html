@@ -86,6 +86,13 @@
             <option value="" disabled selected>Select a tree</option>
           </select>
 
+          <label for="status">Initial Status:</label>
+          <select id="status" name="status" required>
+            <option value="pending">Pending</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+
           <button type="submit">Add Group Mission</button>
         </form>
       </section>
@@ -99,7 +106,6 @@
               <th>Participants</th>
               <th>Tree</th>
               <th>Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -156,8 +162,8 @@
             id: doc.id,
             name: tree.name,
             stocks: tree.stocks,
-            image: tree.image, // Add tree image
-            type: tree.type, // Add tree type
+            image: tree.image,
+            type: tree.type,
           });
           option.textContent = `${tree.name} (Stocks: ${tree.stocks}, Type: ${tree.type})`;
           treeSelect.appendChild(option);
@@ -179,52 +185,21 @@
           const row = document.createElement("tr");
 
           row.innerHTML = `
-      <td>${mission.goal}</td>
-      <td>${mission.participants}</td>
-      <td>
-        ${mission.treeName} 
-        <br><small>(Type: ${mission.treeType})</small>
-        ${
-          mission.treeImage
-            ? `<br><img src="${mission.treeImage}" style="max-width: 100px; max-height: 100px;">`
-            : ""
-        }
-      </td>
-      <td>
-        <select class="status" data-id="${doc.id}">
-          <option value="ongoing" ${
-            mission.status === "ongoing" ? "selected" : ""
-          }>Ongoing</option>
-          <option value="completed" ${
-            mission.status === "completed" ? "selected" : ""
-          }>Completed</option>
-        </select>
-      </td>
-      <td>
-        <button class="save-status" data-id="${doc.id}">Save</button>
-      </td>
-    `;
+            <td>${mission.goal}</td>
+            <td>${mission.participants}</td>
+            <td>
+              ${mission.treeName} 
+              <br><small>(Type: ${mission.treeType})</small>
+              ${
+                mission.treeImage
+                  ? `<br><img src="${mission.treeImage}" style="max-width: 100px; max-height: 100px;">`
+                  : ""
+              }
+            </td>
+            <td>${mission.status}</td>
+          `;
 
           tableBody.appendChild(row);
-        });
-
-        document.querySelectorAll(".save-status").forEach((button) => {
-          button.addEventListener("click", async (e) => {
-            const missionId = e.target.dataset.id;
-            const statusSelect = document.querySelector(
-              `.status[data-id='${missionId}']`
-            );
-            const newStatus = statusSelect.value;
-
-            try {
-              const missionRef = doc(db, "group_missions", missionId);
-              await updateDoc(missionRef, { status: newStatus });
-              alert("Status updated successfully.");
-            } catch (error) {
-              console.error("Error updating status:", error);
-              alert("Failed to update status. Please try again.");
-            }
-          });
         });
       }
 
@@ -239,6 +214,7 @@
             10
           );
           const treeData = JSON.parse(document.getElementById("tree").value);
+          const status = document.getElementById("status").value;
 
           if (participants > treeData.stocks) {
             alert("Not enough stock available for the selected tree.");
@@ -252,7 +228,7 @@
             treeName: treeData.name,
             treeImage: treeData.image,
             treeType: treeData.type,
-            status: "ongoing",
+            status: status,
             timestamp: serverTimestamp(),
           };
 

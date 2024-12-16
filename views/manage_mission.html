@@ -281,37 +281,28 @@
       }
 
       async function isDateOverlapping(newStartDate, newEndDate) {
-        // Check if the new mission overlaps with active mission
-        const activeMissionSnap = await getDoc(activeMissionRef);
-        if (activeMissionSnap.exists()) {
-          const activeMission = activeMissionSnap.data();
-          const activeStart = new Date(
-            activeMission.startDate || activeMission.endDate
-          );
-          const activeEnd = new Date(activeMission.endDate);
+        // Check if the new mission's end date is before or equal to the latest mission's end date
+        const q = query(missionQueueRef, orderBy("endDate", "desc"), limit(1));
+        const querySnapshot = await getDocs(q);
 
-          if (
-            new Date(newStartDate) <= activeEnd &&
-            new Date(newEndDate) >= activeStart
-          ) {
-            return true;
+        if (!querySnapshot.empty) {
+          const latestMission = querySnapshot.docs[0].data();
+          const latestMissionEndDate = new Date(latestMission.endDate);
+          const newEndDateObj = new Date(newEndDate);
+
+          if (newEndDateObj <= latestMissionEndDate) {
+            return true; // Overlapping or before the last mission's end date
           }
         }
 
-        // Check if the new mission overlaps with any mission in the queue
-        const q = query(missionQueueRef);
-        const querySnapshot = await getDocs(q);
+        // Also check the active mission if it exists
+        const activeMissionSnap = await getDoc(activeMissionRef);
+        if (activeMissionSnap.exists()) {
+          const activeMission = activeMissionSnap.data();
+          const activeEndDate = new Date(activeMission.endDate);
 
-        for (const docSnap of querySnapshot.docs) {
-          const mission = docSnap.data();
-          const missionStart = new Date(mission.startDate || mission.endDate);
-          const missionEnd = new Date(mission.endDate);
-
-          if (
-            new Date(newStartDate) <= missionEnd &&
-            new Date(newEndDate) >= missionStart
-          ) {
-            return true;
+          if (new Date(newEndDate) <= activeEndDate) {
+            return true; // Overlapping or before the active mission's end date
           }
         }
 
@@ -326,9 +317,6 @@
         const isOverlapping = await isDateOverlapping(startDate, endDate);
 
         if (isOverlapping) {
-          alert(
-            "This mission overlaps with an existing mission. Please choose a different date."
-          );
           return false;
         }
 
@@ -390,6 +378,10 @@
           if (added) {
             alert("Mission added to queue.");
             e.target.reset();
+          } else {
+            alert(
+              "The mission end date must be after all existing missions' end dates."
+            );
           }
         });
 
