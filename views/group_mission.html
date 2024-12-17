@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manage Group Mission</title>
-    <link rel="stylesheet" href="../styles/manage_mission.css" />
+    <link rel="stylesheet" href="../styles/group_mission.css" />
   </head>
   <body>
     <header>
@@ -18,10 +18,9 @@
         </button>
       </div>
     </header>
-    <!-- Loading Overlay
     <div id="loadingOverlay" class="loading-overlay">
       <div class="spinner"></div>
-    </div> -->
+    </div>
     <main>
       <section class="navigation">
         <div>
@@ -72,46 +71,53 @@
           >
         </div>
       </section>
-      <section>
-        <h2>Create Group Mission</h2>
-        <form id="groupMissionForm">
-          <label for="goal">Goal (Steps):</label>
-          <input type="number" id="goal" name="goal" required />
+      <section class="container">
+        <section class="box">
+          <h2>Create Group Mission</h2>
+          <form id="groupMissionForm">
+            <label for="goal">Goal (Steps):</label>
+            <input type="number" id="goal" name="goal" required />
 
-          <label for="participants">Number of Participants:</label>
-          <input type="number" id="participants" name="participants" required />
+            <label for="participants">Number of Participants:</label>
+            <input
+              type="number"
+              id="participants"
+              name="participants"
+              required
+            />
 
-          <label for="tree">Allocate Tree:</label>
-          <select id="tree" name="tree" required>
-            <option value="" disabled selected>Select a tree</option>
-          </select>
+            <label for="tree">Allocate Tree:</label>
+            <select id="tree" name="tree" required>
+              <option value="" disabled selected>Select a tree</option>
+            </select>
 
-          <label for="status">Initial Status:</label>
-          <select id="status" name="status" required>
-            <option value="pending">Pending</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-          </select>
+            <label for="status">Initial Status:</label>
+            <select id="status" name="status" required>
+              <option value="pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
 
-          <button type="submit">Add Group Mission</button>
-        </form>
-      </section>
+            <button type="submit">Add Group Mission</button>
+          </form>
+        </section>
 
-      <section>
-        <h2>Group Missions</h2>
-        <table id="groupMissionsTable">
-          <thead>
-            <tr>
-              <th>Goal (Steps)</th>
-              <th>Participants</th>
-              <th>Tree</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Group missions will be dynamically loaded here -->
-          </tbody>
-        </table>
+        <section class="box">
+          <h2>Group Missions</h2>
+          <table id="groupMissionsTable">
+            <thead>
+              <tr>
+                <th>Goal (Steps)</th>
+                <th>Participants</th>
+                <th>Tree</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Group missions will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </section>
       </section>
     </main>
 
@@ -119,152 +125,6 @@
       src="https://kit.fontawesome.com/ec19991922.js"
       crossorigin="anonymous"
     ></script>
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import {
-        getFirestore,
-        doc,
-        setDoc,
-        addDoc,
-        collection,
-        getDoc,
-        query,
-        where,
-        getDocs,
-        updateDoc,
-        serverTimestamp,
-        orderBy,
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyAUIljfabkgsGO8FkLTfSNMpd7NeZW0a_M",
-        authDomain: "treestride-project.firebaseapp.com",
-        projectId: "treestride-project",
-        storageBucket: "treestride-project.appspot.com",
-        messagingSenderId: "218404996569",
-        appId: "1:218404996569:web:d1daa406334c19cde5c5c8",
-        measurementId: "G-XR01C3LFWD",
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      async function loadTreeOptions() {
-        const treeRef = collection(db, "tree_inventory");
-        const treeSnapshot = await getDocs(treeRef);
-
-        const treeSelect = document.getElementById("tree");
-
-        treeSnapshot.forEach((doc) => {
-          const tree = doc.data();
-          const option = document.createElement("option");
-          option.value = JSON.stringify({
-            id: doc.id,
-            name: tree.name,
-            stocks: tree.stocks,
-            image: tree.image,
-            type: tree.type,
-          });
-          option.textContent = `${tree.name} (Stocks: ${tree.stocks}, Type: ${tree.type})`;
-          treeSelect.appendChild(option);
-        });
-      }
-
-      async function loadGroupMissions() {
-        const missionsRef = query(
-          collection(db, "group_missions"),
-          orderBy("timestamp", "desc")
-        );
-        const missionsSnapshot = await getDocs(missionsRef);
-
-        const tableBody = document.querySelector("#groupMissionsTable tbody");
-        tableBody.innerHTML = "";
-
-        missionsSnapshot.forEach((doc) => {
-          const mission = doc.data();
-          const row = document.createElement("tr");
-
-          row.innerHTML = `
-            <td>${mission.goal}</td>
-            <td>${mission.participants}</td>
-            <td>
-              ${mission.treeName} 
-              <br><small>(Type: ${mission.treeType})</small>
-              ${
-                mission.treeImage
-                  ? `<br><img src="${mission.treeImage}" style="max-width: 100px; max-height: 100px;">`
-                  : ""
-              }
-            </td>
-            <td>${mission.status}</td>
-          `;
-
-          tableBody.appendChild(row);
-        });
-      }
-
-      document
-        .getElementById("groupMissionForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          const goal = parseInt(document.getElementById("goal").value, 10);
-          const participants = parseInt(
-            document.getElementById("participants").value,
-            10
-          );
-          const treeData = JSON.parse(document.getElementById("tree").value);
-          const status = document.getElementById("status").value;
-
-          if (participants > treeData.stocks) {
-            alert("Not enough stock available for the selected tree.");
-            return;
-          }
-
-          const groupMission = {
-            goal,
-            participants,
-            participantsJoined: [],
-            treeName: treeData.name,
-            treeImage: treeData.image,
-            treeType: treeData.type,
-            status: status,
-            timestamp: serverTimestamp(),
-          };
-
-          try {
-            // Add group mission to Firestore
-            await addDoc(collection(db, "group_missions"), groupMission);
-
-            // Deduct tree stock
-            const treeRef = doc(db, "tree_inventory", treeData.id);
-            await updateDoc(treeRef, {
-              stocks: treeData.stocks - participants,
-            });
-
-            // Log the stock deduction in stock_entries
-            await addDoc(collection(db, "stock_entries"), {
-              treeId: treeData.id,
-              treeName: treeData.name,
-              treeImage: treeData.image,
-              treeType: treeData.type,
-              quantity: participants,
-              operation: "allotted",
-              notes: `Allocated for group mission`,
-              timestamp: serverTimestamp(),
-            });
-
-            alert("Group mission added successfully.");
-            e.target.reset();
-            loadGroupMissions();
-          } catch (error) {
-            console.error("Error adding group mission:", error);
-            alert("Failed to add group mission. Please try again.");
-          }
-        });
-
-      loadTreeOptions();
-      loadGroupMissions();
-    </script>
+    <script type="module" src="../scripts/group_mission.js"></script>
   </body>
 </html>
