@@ -31,16 +31,17 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const PAGE_PERMISSIONS = {
-  'dashboard.html': ['admin', 'sub-admin', 'forester'],
-  'manage_mission.html': ['admin', 'sub-admin'],
-  'announcements.html': ['admin', 'sub-admin'],
-  'planting_requests.html': ['admin', 'sub-admin'],
-  'tree_inventory.html': ['admin', 'sub-admin', 'forester'],
-  'manage_trees.html': ['admin', 'sub-admin', 'forester'],
-  'goal_cms.html': ['admin', 'sub-admin'],
-  'reported_posts.html': ['admin', 'sub-admin'],
-  'users.html': ['admin'], 
-  'staffs.html': ['admin']
+  "dashboard.html": ["admin", "sub-admin", "forester"],
+  "manage_mission.html": ["admin", "sub-admin"],
+  "group_mission.html": ["admin", "sub-admin"],
+  "announcements.html": ["admin", "sub-admin"],
+  "planting_requests.html": ["admin", "sub-admin"],
+  "tree_inventory.html": ["admin", "sub-admin", "forester"],
+  "manage_trees.html": ["admin", "sub-admin", "forester"],
+  "goal_cms.html": ["admin", "sub-admin"],
+  "reported_posts.html": ["admin", "sub-admin"],
+  "users.html": ["admin"],
+  "staffs.html": ["admin"],
 };
 
 // Add loading state management
@@ -144,6 +145,7 @@ window.addWalkingGoal = async function () {
     await addDoc(collection(db, "walkingGoals"), {
       goal: goal.toString(),
     });
+    alert("Goal steps added.");
     goalInput.value = "";
     loadWalkingGoals();
   } catch (error) {
@@ -220,6 +222,7 @@ window.addJoggingGoal = async function () {
     await addDoc(collection(db, "joggingGoals"), {
       goal: goal.toString(),
     });
+    alert("Goal steps added.");
     goalInput.value = "";
     loadJoggingGoals();
   } catch (error) {
@@ -296,6 +299,7 @@ window.addRunningGoal = async function () {
     await addDoc(collection(db, "runningGoals"), {
       goal: goal.toString(),
     });
+    alert("Goal steps added.");
     goalInput.value = "";
     loadRunningGoals();
   } catch (error) {
@@ -345,6 +349,18 @@ window.deleteRunningGoal = async function (id) {
     }
   }
 };
+
+ // Sign out function
+ const signOutButton = document.getElementById("sign-out");
+ signOutButton.addEventListener("click", () => {
+   signOut(auth)
+     .then(() => {
+       window.location.href = "../index.html";
+     })
+     .catch((error) => {
+       console.error("Error signing out: ", error);
+     });
+ });
 
 // Load goals when the page loads
 document.addEventListener("DOMContentLoaded", () => {

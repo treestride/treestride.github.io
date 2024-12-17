@@ -40,16 +40,17 @@
       const db = getFirestore(app);
 
       const PAGE_PERMISSIONS = {
-        'dashboard.html': ['admin', 'sub-admin', 'forester'],
-        'manage_mission.html': ['admin', 'sub-admin'],
-        'announcements.html': ['admin', 'sub-admin'],
-        'planting_requests.html': ['admin', 'sub-admin'],
-        'tree_inventory.html': ['admin', 'sub-admin', 'forester'],
-        'manage_trees.html': ['admin', 'sub-admin', 'forester'],
-        'goal_cms.html': ['admin', 'sub-admin'],
-        'reported_posts.html': ['admin', 'sub-admin'],
-        'users.html': ['admin'], 
-        'staffs.html': ['admin']
+        "dashboard.html": ["admin", "sub-admin", "forester"],
+        "manage_mission.html": ["admin", "sub-admin"],
+        "group_mission.html": ["admin", "sub-admin"],
+        "announcements.html": ["admin", "sub-admin"],
+        "planting_requests.html": ["admin", "sub-admin"],
+        "tree_inventory.html": ["admin", "sub-admin", "forester"],
+        "manage_trees.html": ["admin", "sub-admin", "forester"],
+        "goal_cms.html": ["admin", "sub-admin"],
+        "reported_posts.html": ["admin", "sub-admin"],
+        "users.html": ["admin"],
+        "staffs.html": ["admin"],
       };
 
       // Add loading state management

@@ -44,16 +44,17 @@ const treesCollectionRef = collection(db, "tree_inventory");
 const stockEntriesCollectionRef = collection(db, "stock_entries");
 
 const PAGE_PERMISSIONS = {
-  'dashboard.html': ['admin', 'sub-admin', 'forester'],
-  'manage_mission.html': ['admin', 'sub-admin'],
-  'announcements.html': ['admin', 'sub-admin'],
-  'planting_requests.html': ['admin', 'sub-admin'],
-  'tree_inventory.html': ['admin', 'sub-admin', 'forester'],
-  'manage_trees.html': ['admin', 'sub-admin', 'forester'],
-  'goal_cms.html': ['admin', 'sub-admin'],
-  'reported_posts.html': ['admin', 'sub-admin'],
-  'users.html': ['admin'], 
-  'staffs.html': ['admin']
+  "dashboard.html": ["admin", "sub-admin", "forester"],
+  "manage_mission.html": ["admin", "sub-admin"],
+  "group_mission.html": ["admin", "sub-admin"],
+  "announcements.html": ["admin", "sub-admin"],
+  "planting_requests.html": ["admin", "sub-admin"],
+  "tree_inventory.html": ["admin", "sub-admin", "forester"],
+  "manage_trees.html": ["admin", "sub-admin", "forester"],
+  "goal_cms.html": ["admin", "sub-admin"],
+  "reported_posts.html": ["admin", "sub-admin"],
+  "users.html": ["admin"],
+  "staffs.html": ["admin"],
 };
 
 // Pagination constants for stock entries
@@ -167,7 +168,7 @@ function clearForm() {
   document.getElementById("treeId").value = "";
 }
 
-const ITEMS_PER_PAGE = 5; // Number of items per page
+const ITEMS_PER_PAGE = 3; // Number of items per page
 let currentPage = 1;
 let filteredTrees = []; // Store all filtered trees
 
@@ -231,21 +232,26 @@ async function logStockEntry(treeId, operation, quantity) {
 // Load and display stock entries
 async function loadStockEntries() {
   try {
-    const stockEntriesTable = document.getElementById("stockEntriesTable");
     const stockEntriesBody = document.getElementById("stockEntriesBody");
     stockEntriesBody.innerHTML = ""; // Clear previous entries
 
-    // Query to get stock entries with pagination
+    // Fetch total stock entries count
+    if (currentStockEntriesPage === 1) {
+      const totalSnapshot = await getDocs(stockEntriesCollectionRef);
+      totalStockEntries = totalSnapshot.size;
+    }
+
+    // Query for the current page
     let q = query(
-      stockEntriesCollectionRef, 
+      stockEntriesCollectionRef,
       orderBy("timestamp", "desc"),
       limit(STOCK_ENTRIES_PER_PAGE)
     );
 
-    // If not first page, use the last document from previous query
+    // If not the first page, use `startAfter` for pagination
     if (currentStockEntriesPage > 1 && lastStockEntrySnapshot) {
       q = query(
-        stockEntriesCollectionRef, 
+        stockEntriesCollectionRef,
         orderBy("timestamp", "desc"),
         startAfter(lastStockEntrySnapshot),
         limit(STOCK_ENTRIES_PER_PAGE)
@@ -254,19 +260,16 @@ async function loadStockEntries() {
 
     const snapshot = await getDocs(q);
 
-    // Update last document for next pagination
     if (!snapshot.empty) {
       lastStockEntrySnapshot = snapshot.docs[snapshot.docs.length - 1];
     }
 
-    // Render stock entries
+    // Render entries
     snapshot.forEach((doc) => {
       const entry = doc.data();
       const row = document.createElement("tr");
-      
-      // Format timestamp
-      const timestamp = entry.timestamp 
-        ? new Date(entry.timestamp.toDate()).toLocaleString() 
+      const timestamp = entry.timestamp
+        ? new Date(entry.timestamp.toDate()).toLocaleString()
         : "N/A";
 
       row.innerHTML = `
@@ -274,28 +277,48 @@ async function loadStockEntries() {
         <td>${entry.operation}</td>
         <td>${entry.quantity}</td>
         <td>${timestamp}</td>
-        <td>${entry.notes || ''}</td>
+        <td>${entry.notes || ""}</td>
       `;
       stockEntriesBody.appendChild(row);
     });
 
-    // Render stock entries pagination
+    // Render pagination controls
     renderStockEntriesPagination();
   } catch (error) {
     console.error("Error loading stock entries:", error);
+    alert("Error loading stock entries!");
   }
 }
 
 // Render stock entries pagination
 function renderStockEntriesPagination() {
-  const stockEntriesPaginationContainer = document.getElementById("stockEntriesPaginationContainer");
+  const stockEntriesPaginationContainer = document.getElementById(
+    "stockEntriesPaginationContainer"
+  );
   stockEntriesPaginationContainer.innerHTML = ""; // Clear previous pagination
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalStockEntries / STOCK_ENTRIES_PER_PAGE);
+
+  // Page Info Display
+  const pageInfo = document.createElement("div");
+  pageInfo.textContent = `Page ${currentStockEntriesPage} of ${totalPages}`;
+  pageInfo.classList.add("page-info");
+  stockEntriesPaginationContainer.appendChild(pageInfo);
+
+  // First button
+  if (currentStockEntriesPage > 1) {
+    const firstButton = createStockEntriesPaginationButton("« First", () => {
+      currentStockEntriesPage = 1;
+      lastStockEntrySnapshot = null;
+      loadStockEntries();
+    });
+    stockEntriesPaginationContainer.appendChild(firstButton);
+  }
 
   // Previous button
   if (currentStockEntriesPage > 1) {
-    const prevButton = document.createElement("button");
-    prevButton.innerHTML = "&laquo; Previous";
-    prevButton.addEventListener("click", () => {
+    const prevButton = createStockEntriesPaginationButton("‹ Prev", () => {
       currentStockEntriesPage--;
       loadStockEntries();
     });
@@ -303,14 +326,36 @@ function renderStockEntriesPagination() {
   }
 
   // Next button
-  const nextButton = document.createElement("button");
-  nextButton.innerHTML = "Next &raquo;";
-  nextButton.addEventListener("click", () => {
-    currentStockEntriesPage++;
-    loadStockEntries();
-  });
-  stockEntriesPaginationContainer.appendChild(nextButton);
+  if (currentStockEntriesPage < totalPages) {
+    const nextButton = createStockEntriesPaginationButton("Next ›", () => {
+      currentStockEntriesPage++;
+      loadStockEntries();
+    });
+    stockEntriesPaginationContainer.appendChild(nextButton);
+  }
+
+  // Last button
+  if (currentStockEntriesPage < totalPages) {
+    const lastButton = createStockEntriesPaginationButton("Last »", () => {
+      currentStockEntriesPage = totalPages;
+      loadStockEntries();
+    });
+    stockEntriesPaginationContainer.appendChild(lastButton);
+  }
 }
+
+// Helper function to create pagination buttons
+function createStockEntriesPaginationButton(text, onClick, isDisabled = false) {
+  const button = document.createElement("button");
+  button.textContent = text;
+  if (isDisabled) {
+    button.disabled = true;
+    button.classList.add("disabled");
+  }
+  button.addEventListener("click", onClick);
+  return button;
+}
+
 
 function renderTrees() {
   const treeItems = document.getElementById("treeItems");
@@ -328,25 +373,23 @@ function renderTrees() {
 
 function renderPagination() {
   const paginationContainer = document.getElementById("paginationContainer");
-  if (!paginationContainer) {
-    // Create pagination container if it doesn't exist
-    const container = document.createElement("div");
-    container.id = "paginationContainer";
-    container.className = "pagination";
-    document.querySelector(".content").appendChild(container);
-  }
+  paginationContainer.innerHTML = ""; // Clear previous pagination
 
-  // Clear previous pagination
-  paginationContainer.innerHTML = "";
-
-  // Calculate total pages
   const totalPages = Math.ceil(filteredTrees.length / ITEMS_PER_PAGE);
+
+  // First button
+  if (currentPage > 1) {
+    const firstButton = createPaginationButton("« First", () => {
+      currentPage = 1;
+      renderTrees();
+      renderPagination();
+    });
+    paginationContainer.appendChild(firstButton);
+  }
 
   // Previous button
   if (currentPage > 1) {
-    const prevButton = document.createElement("button");
-    prevButton.innerHTML = "&laquo; Previous";
-    prevButton.addEventListener("click", () => {
+    const prevButton = createPaginationButton("‹ Prev", () => {
       currentPage--;
       renderTrees();
       renderPagination();
@@ -356,31 +399,44 @@ function renderPagination() {
 
   // Page numbers
   for (let i = 1; i <= totalPages; i++) {
-    const pageButton = document.createElement("button");
-    pageButton.textContent = i;
-    if (i === currentPage) {
-      pageButton.classList.add("active");
-    }
-    pageButton.addEventListener("click", () => {
+    const pageButton = createPaginationButton(i, () => {
       currentPage = i;
       renderTrees();
       renderPagination();
-    });
+    }, i === currentPage);
     paginationContainer.appendChild(pageButton);
   }
 
   // Next button
   if (currentPage < totalPages) {
-    const nextButton = document.createElement("button");
-    nextButton.innerHTML = "Next &raquo;";
-    nextButton.addEventListener("click", () => {
+    const nextButton = createPaginationButton("Next ›", () => {
       currentPage++;
       renderTrees();
       renderPagination();
     });
     paginationContainer.appendChild(nextButton);
   }
+
+  // Last button
+  if (currentPage < totalPages) {
+    const lastButton = createPaginationButton("Last »", () => {
+      currentPage = totalPages;
+      renderTrees();
+      renderPagination();
+    });
+    paginationContainer.appendChild(lastButton);
+  }
 }
+
+// Helper function to create pagination buttons
+function createPaginationButton(text, onClick, isActive = false) {
+  const button = document.createElement("button");
+  button.textContent = text;
+  if (isActive) button.classList.add("active");
+  button.addEventListener("click", onClick);
+  return button;
+}
+
 
 async function updateStatistics() {
   try {
@@ -679,13 +735,15 @@ document.getElementById("saveTree").addEventListener("click", async (event) => {
   await initializePage(); // Reload and re-render after saving
 });
 
-document
-  .getElementById("searchInput")
-  .addEventListener("input", loadTrees);
+document.getElementById("searchInput").addEventListener("input", () => {
+  currentPage = 1; // Reset to first page
+  loadTrees();
+});
 
-document
-  .getElementById("typeFilter")
-  .addEventListener("change", loadTrees);
+document.getElementById("typeFilter").addEventListener("change", () => {
+  currentPage = 1; // Reset to first page
+  loadTrees();
+});
 
 // Initial load
 initializePage();
