@@ -380,32 +380,37 @@ header h1{
   visibility: hidden;
   pointer-events: none;
 }
-
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+  gap: 5px; /* Add spacing between buttons */
 }
 
 .pagination button {
-  margin: 0 5px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background-color: #38a169;
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
+  background-color: #f7fafc;
+  color: var(--text-primary);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .pagination button:hover {
-  background-color: #e9ecef;
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 .pagination button.active {
-  background-color: #2f855a;
+  background-color: var(--primary-color);
   color: white;
-  border-color: #3a9249;
+  border-color: var(--primary-hover);
 }
+
 
 .stock-entries {
   margin-top: 20px;
@@ -426,3 +431,11 @@ header h1{
 .stock-entries-table thead {
   background-color: #f2f2f2;
 }
+
+.page-info {
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
